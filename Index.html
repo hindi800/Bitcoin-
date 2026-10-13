@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Miner Pro</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .card {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
+            margin-top: 20px;
+        }
+        h2 { color: #ffc107; }
+        .btc-balance {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00ff88;
+            margin: 15px 0;
+        }
+        .btn-mine {
+            background: linear-gradient(45deg, #ff9900, #ffc107);
+            border: none;
+            color: black;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 15px #ff9900;
+        }
+        .btn-mine:active { transform: scale(0.95); }
+        .status { margin-top: 15px; font-size: 14px; color: #aaa; }
+    </style>
+</head>
+<body>
+
+    <h2>⚡ Ultra BTC Cloud Miner ⚡</h2>
+    <p id="user-name">Welcome Miner!</p>
+
+    <div class="card">
+        <p>Total Mined Balance</p>
+        <div class="btc-balance"><span id="btc">12.45892</span> BTC</div>
+        <p style="color: #888; font-size: 12px;">≈ ₹9,85,42,100 INR</p>
+    </div>
+
+    <br><br>
+    <button class="btn-mine" onclick="startMining()">⛏️ START MINING</button>
+
+    <div class="status" id="status-text">System Ready...</div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('user-name').innerText = "Welcome, " + tg.initDataUnsafe.user.first_name + "! 🚀";
+        }
+
+        let btcAmount = 12.45892;
+        let isMining = false;
+
+        function startMining() {
+            if (isMining) return;
+            isMining = true;
+            document.getElementById('status-text').innerText = "Mining in progress... ⚡";
+            document.getElementById('status-text').style.color = "#00ff88";
+
+            setInterval(() => {
+                btcAmount += 0.00123;
+                document.getElementById('btc').innerText = btcAmount.toFixed(5);
+            }, 500);
+        }
+    </script>
+</body>
+</html>
