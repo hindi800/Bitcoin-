@@ -1,85 +1,356 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Miner Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bitcoin Cloud Miner Pro</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #121212;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+            user-select: none;
         }
+
+        body {
+            background: #080b10;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Cards */
         .card {
-            background: #1e1e1e;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.3);
-            margin-top: 20px;
+            background: rgba(18, 24, 38, 0.75);
+            border: 1px solid rgba(247, 147, 26, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(8px);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 400px;
+            padding: 18px;
+            margin-bottom: 15px;
         }
-        h2 { color: #ffc107; }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            background: linear-gradient(45deg, #f7931a, #ffb703);
+            color: #000;
+            font-weight: 800;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Main Balance Display */
+        .balance-container {
+            text-align: center;
+            background: radial-gradient(circle, rgba(247,147,26,0.1) 0%, rgba(0,0,0,0) 70%);
+        }
+
+        .balance-title {
+            color: #8a99ad;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
         .btc-balance {
+            font-family: 'Orbitron', sans-serif;
             font-size: 28px;
-            font-weight: bold;
+            font-weight: 800;
+            color: #f7931a;
+            margin: 8px 0;
+            text-shadow: 0 0 15px rgba(247, 147, 26, 0.4);
+        }
+
+        .usd-balance {
             color: #00ff88;
-            margin: 15px 0;
+            font-size: 15px;
+            font-weight: 600;
         }
+
+        /* Mining Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            background: rgba(13, 17, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #6c7a8c;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        /* Animated Mining Button */
         .btn-mine {
-            background: linear-gradient(45deg, #ff9900, #ffc107);
+            width: 100%;
+            max-width: 400px;
+            padding: 16px;
             border: none;
-            color: black;
-            padding: 15px 30px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #f7931a, #d47a00);
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
             cursor: pointer;
-            box-shadow: 0 0 15px #ff9900;
+            box-shadow: 0 0 20px rgba(247, 147, 26, 0.4);
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
         }
-        .btn-mine:active { transform: scale(0.95); }
-        .status { margin-top: 15px; font-size: 14px; color: #aaa; }
+
+        .btn-mine:active {
+            transform: scale(0.98);
+        }
+
+        .btn-mine.active {
+            background: linear-gradient(135deg, #e63946, #b71c1c);
+            box-shadow: 0 0 20px rgba(230, 57, 70, 0.4);
+        }
+
+        /* Action Buttons */
+        .action-row {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 15px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Console Terminal */
+        .terminal {
+            background: #000000;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 11px;
+            height: 100px;
+            overflow-y: hidden;
+            width: 100%;
+            max-width: 400px;
+            color: #00ff88;
+        }
+
+        .log-line {
+            margin-bottom: 3px;
+            opacity: 0.8;
+        }
+
+        /* Popup Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #121826;
+            border: 1px solid #f7931a;
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #f7931a;
+            margin-bottom: 10px;
+        }
+
+        .modal-btn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #f7931a;
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <h2>⚡ Ultra BTC Cloud Miner ⚡</h2>
-    <p id="user-name">Welcome Miner!</p>
-
-    <div class="card">
-        <p>Total Mined Balance</p>
-        <div class="btc-balance"><span id="btc">12.45892</span> BTC</div>
-        <p style="color: #888; font-size: 12px;">≈ ₹9,85,42,100 INR</p>
+    <!-- Header -->
+    <div class="header">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:22px;">₿</span>
+            <span style="font-weight:700; font-size:18px;">ANTMINER S21</span>
+        </div>
+        <span class="badge" id="statusBadge">OFFLINE</span>
     </div>
 
-    <br><br>
-    <button class="btn-mine" onclick="startMining()">⛏️ START MINING</button>
+    <!-- Main Balance Card -->
+    <div class="card balance-container">
+        <div class="balance-title">Unconfirmed Balance</div>
+        <div class="btc-balance" id="btcVal">0.00000000</div>
+        <div class="usd-balance">≈ $<span id="usdVal">0.00</span> USD</div>
+    </div>
 
-    <div class="status" id="status-text">System Ready...</div>
+    <!-- Mining Stats -->
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-label">HASHRATE</div>
+            <div class="stat-value" id="hashVal">0.00 TH/s</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">TEMP / POWER</div>
+            <div class="stat-value" id="tempVal">32°C / 0W</div>
+        </div>
+    </div>
+
+    <!-- Start Button -->
+    <button class="btn-mine" id="mineBtn" onclick="toggleMining()">START CLOUD MINING</button>
+
+    <!-- Quick Actions -->
+    <div class="action-row">
+        <button class="btn-secondary" onclick="showPopup('Withdrawal Lock', 'Minimum withdrawal threshold is 0.05000000 BTC. Keep mining to unlock direct transfer.')">⚡ WITHDRAW</button>
+        <button class="btn-secondary" onclick="showPopup('Boost Hashrate', 'Cloud node allocation full for today. Try again in 24 hours.')">🚀 BOOST 2X</button>
+    </div>
+
+    <!-- Live Terminal -->
+    <div class="terminal" id="terminal">
+        <div class="log-line">> System initialized. Ready to connect to pool...</div>
+    </div>
+
+    <!-- Prank Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="mTitle">Alert</h3>
+            <p id="mText" style="color:#ccc; font-size:14px; line-height:1.4;"></p>
+            <button class="modal-btn" onclick="closePopup()">ACKNOWLEDGE</button>
+        </div>
+    </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
+        let tg = window.Telegram.WebApp;
         tg.expand();
 
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('user-name').innerText = "Welcome, " + tg.initDataUnsafe.user.first_name + "! 🚀";
+        let isMining = false;
+        let btc = 0.00000000;
+        let btcPrice = 67500; // Simulated BTC Price
+        let timer = null;
+
+        function toggleMining() {
+            let btn = document.getElementById('mineBtn');
+            let badge = document.getElementById('statusBadge');
+
+            if(!isMining) {
+                isMining = true;
+                btn.innerText = "STOP MINING RIG";
+                btn.classList.add('active');
+                badge.innerText = "MINING LIVE";
+                badge.style.background = "linear-gradient(45deg, #00ff88, #00b894)";
+                addLog("Connecting to Stratum Pool: btc.slushpool.com:3333...");
+                
+                timer = setInterval(() => {
+                    btc += 0.00000018 + (Math.random() * 0.00000005);
+                    document.getElementById('btcVal').innerText = btc.toFixed(8);
+                    document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+                    
+                    let hash = (42 + Math.random() * 5.5).toFixed(1);
+                    document.getElementById('hashVal').innerText = hash + " TH/s";
+
+                    let temp = Math.floor(64 + Math.random() * 6);
+                    let watt = Math.floor(1320 + Math.random() * 40);
+                    document.getElementById('tempVal').innerText = temp + "°C / " + watt + "W";
+
+                    if(Math.random() > 0.6) {
+                        let blocks = [840120, 840121, 840122, 840123];
+                        let randomBlock = blocks[Math.floor(Math.random()*blocks.length)];
+                        addLog("[SUCCESS] Shares accepted for Block #" + randomBlock);
+                    }
+                }, 800);
+            } else {
+                isMining = false;
+                clearInterval(timer);
+                btn.innerText = "START CLOUD MINING";
+                btn.classList.remove('active');
+                badge.innerText = "OFFLINE";
+                badge.style.background = "linear-gradient(45deg, #f7931a, #ffb703)";
+                document.getElementById('hashVal').innerText = "0.00 TH/s";
+                document.getElementById('tempVal').innerText = "32°C / 0W";
+                addLog("Mining paused by user.");
+            }
         }
 
-        let btcAmount = 12.45892;
-        let isMining = false;
+        function addLog(text) {
+            let term = document.getElementById('terminal');
+            let line = document.createElement('div');
+            line.className = 'log-line';
+            line.innerText = "> " + text;
+            term.appendChild(line);
+            term.scrollTop = term.scrollHeight;
+        }
 
-        function startMining() {
-            if (isMining) return;
-            isMining = true;
-            document.getElementById('status-text').innerText = "Mining in progress... ⚡";
-            document.getElementById('status-text').style.color = "#00ff88";
+        function showPopup(title, text) {
+            document.getElementById('mTitle').innerText = title;
+            document.getElementById('mText').innerText = text;
+            document.getElementById('modal').style.display = 'flex';
+        }
 
-            setInterval(() => {
-                btcAmount += 0.00123;
-                document.getElementById('btc').innerText = btcAmount.toFixed(5);
-            }, 500);
+        function closePopup() {
+            document.getElementById('modal').style.display = 'none';
         }
     </script>
 </body>
