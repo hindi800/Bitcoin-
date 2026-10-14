@@ -3,355 +3,2746 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Bitcoin Cloud Miner Pro</title>
+    <title>VALENCE | Enterprise Cloud Protocol</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #090b10;
+            --surface-1: #11141c;
+            --surface-2: #181c26;
+            --surface-3: #1c2130;
+            --border: rgba(255, 255, 255, 0.07);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --accent-green: #10b981;
+            --accent-green-bg: rgba(16, 185, 129, 0.1);
+            --accent-green-dim: rgba(16, 185, 129, 0.25);
+            --accent-blue: #60a5fa;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --font-mono: 'JetBrains Mono', monospace;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.15);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 8px;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: #080b10;
-            color: #fff;
+            background-color: var(--bg);
+            color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 15px;
+            padding-bottom: 90px;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            background-image: 
+                radial-gradient(ellipse at 20% 0%, rgba(16, 185, 129, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 100%, rgba(16, 185, 129, 0.03) 0%, transparent 50%);
         }
 
-        /* Glassmorphism Cards */
-        .card {
-            background: rgba(18, 24, 38, 0.75);
-            border: 1px solid rgba(247, 147, 26, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            width: 100%;
-            max-width: 400px;
-            padding: 18px;
-            margin-bottom: 15px;
-        }
-
-        /* Header */
+        /* ============ HEADER ============ */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 15px;
+            padding: 14px 20px;
+            background: rgba(9, 11, 16, 0.85);
+            backdrop-filter: blur(24px) saturate(1.2);
+            -webkit-backdrop-filter: blur(24px) saturate(1.2);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow-sm);
         }
 
-        .badge {
-            background: linear-gradient(45deg, #f7931a, #ffb703);
-            color: #000;
-            font-weight: 800;
+        .brand { display: flex; align-items: center; gap: 10px; }
+
+        .brand-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+            border-radius: var(--radius-xs);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; color: #000; font-size: 15px;
+            box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        .brand-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+        .brand-sub { font-size: 9px; color: var(--text-muted); font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+
+        .notif-btn {
+            position: relative;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            width: 34px; height: 34px;
+            border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .notif-btn:active { transform: scale(0.94); background: var(--surface-3); }
+
+        .notif-btn svg { width: 16px; height: 16px; fill: var(--text-secondary); }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            background: var(--accent-red);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--bg);
+            font-family: var(--font-mono);
+        }
+
+        .wallet-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
             font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Main Balance Display */
-        .balance-container {
-            text-align: center;
-            background: radial-gradient(circle, rgba(247,147,26,0.1) 0%, rgba(0,0,0,0) 70%);
-        }
-
-        .balance-title {
-            color: #8a99ad;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .btc-balance {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 28px;
-            font-weight: 800;
-            color: #f7931a;
-            margin: 8px 0;
-            text-shadow: 0 0 15px rgba(247, 147, 26, 0.4);
-        }
-
-        .usd-balance {
-            color: #00ff88;
-            font-size: 15px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex; align-items: center; gap: 6px;
+            font-family: var(--font-mono);
         }
 
-        /* Mining Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 15px;
+        .wallet-btn:active { transform: scale(0.96); border-color: var(--border-hover); background: var(--surface-3); }
+
+        .wallet-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--text-muted);
+            transition: all 0.3s ease;
         }
 
-        .stat-box {
-            background: rgba(13, 17, 23, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 12px;
+        .wallet-dot.connected {
+            background: var(--accent-green);
+            box-shadow: 0 0 6px var(--accent-green);
+        }
+
+        /* ============ MARKET TICKER ============ */
+        .market-ticker {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 20px;
+            background: rgba(9, 11, 16, 0.6);
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-secondary);
+            overflow-x: auto;
+            white-space: nowrap;
+            position: sticky;
+            top: 63px;
+            z-index: 49;
+            backdrop-filter: blur(20px);
+        }
+
+        .market-ticker::-webkit-scrollbar { display: none; }
+        .ticker-item { display: flex; align-items: center; gap: 6px; }
+        .ticker-label { color: var(--text-muted); font-weight: 600; }
+        .ticker-value { color: var(--text-primary); font-weight: 600; }
+        .ticker-value.up { color: var(--accent-green); }
+        .ticker-value.down { color: var(--accent-red); }
+
+        .live-pip {
+            width: 5px; height: 5px; border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 5px var(--accent-green);
+            animation: pulseDot 1.5s ease-in-out infinite;
+        }
+
+        /* ============ PAGES ============ */
+        .page {
+            display: none;
+            padding: 20px;
+            max-width: 440px;
+            margin: 0 auto;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .page.active {
+            display: flex;
+            animation: pageSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes pageSlideIn {
+            from { opacity: 0; transform: translateY(8px) scale(0.995); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ============ HERO CARD ============ */
+        .hero-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px 20px 24px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: box-shadow 0.4s ease, border-color 0.4s ease;
         }
 
-        .stat-label {
-            font-size: 11px;
-            color: #6c7a8c;
+        .hero-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+        }
+
+        .hero-card.mining-active {
+            border-color: rgba(16, 185, 129, 0.2);
+            box-shadow: var(--shadow-md), var(--shadow-glow);
+            animation: breatheGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes breatheGlow {
+            0%, 100% { box-shadow: var(--shadow-md), 0 0 20px rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.15); }
+            50% { box-shadow: var(--shadow-md), 0 0 32px rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.3); }
+        }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px; font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .status-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--text-muted);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .status-badge.active .status-dot {
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+            animation: pulseDot 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(0.85); }
+        }
+
+        .status-badge.active {
+            color: var(--accent-green);
+            background: var(--accent-green-bg);
+            border-color: rgba(16, 185, 129, 0.25);
+        }
+
+        .balance-label {
+            font-size: 11px; color: var(--text-muted); font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.8px;
+        }
+
+        .balance-value {
+            font-size: 36px; font-weight: 700;
+            letter-spacing: -1.5px;
+            margin: 8px 0 2px 0;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            transition: text-shadow 0.3s ease;
+        }
+
+        .hero-card.mining-active .balance-value {
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.15);
+        }
+
+        .balance-sub {
+            font-size: 14px; color: var(--accent-green); font-weight: 600;
+            font-family: var(--font-mono);
+        }
+
+        /* ============ BUTTONS ============ */
+        .primary-btn {
+            width: 100%; padding: 16px;
+            background: #ffffff; border: none;
+            border-radius: 14px;
+            color: #000000; font-size: 14px; font-weight: 700;
+            cursor: pointer; margin-top: 20px;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.8);
+        }
+
+        .primary-btn:active { transform: scale(0.98); opacity: 0.9; }
+
+        .primary-btn.running {
+            background: var(--accent-red); color: #ffffff;
+            box-shadow: 0 2px 12px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+
+        .secondary-btn {
+            width: 100%; padding: 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            font-size: 13px; font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .secondary-btn:active { transform: scale(0.97); background: var(--surface-3); border-color: var(--border-hover); }
+
+        .secondary-btn.accent {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: #000; font-weight: 700;
+        }
+
+        .secondary-btn.accent:active { background: #0ea371; border-color: #0ea371; }
+
+        .secondary-btn.small { padding: 8px 12px; font-size: 12px; width: auto; }
+
+        /* ============ METRICS ============ */
+        .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .metrics-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+        .metric-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .metric-card:hover { border-color: var(--border-hover); }
+
+        .metric-label {
+            font-size: 10px; color: var(--text-muted); font-weight: 600;
+            margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.6px;
+        }
+
+        .metric-value {
+            font-size: 17px; font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+        }
+
+        .metric-sub {
+            font-size: 10px; color: var(--accent-green); font-weight: 500;
+            margin-top: 4px; font-family: var(--font-mono);
+        }
+
+        .metric-sub.muted { color: var(--text-muted); }
+        .metric-sub.amber { color: var(--accent-amber); }
+        .metric-sub.red { color: var(--accent-red); }
+
+        .telem-bar {
+            height: 3px; background: var(--surface-2);
+            border-radius: 2px; margin-top: 8px; overflow: hidden;
+        }
+
+        .telem-fill {
+            height: 100%; background: var(--accent-green);
+            border-radius: 2px;
+            transition: width 0.6s ease;
+            box-shadow: 0 0 6px rgba(16,185,129,0.4);
+        }
+
+        .telem-fill.warn { background: var(--accent-amber); box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+        .telem-fill.danger { background: var(--accent-red); box-shadow: 0 0 6px rgba(239,68,68,0.4); }
+
+        .fan-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-top: 10px; padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .fan-icon {
+            width: 20px; height: 20px;
+            fill: var(--text-secondary);
+            transition: transform 0.3s;
+        }
+
+        .fan-icon.spinning {
+            animation: spin 0.8s linear infinite;
+            fill: var(--accent-green);
+        }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* ============ TERMINAL ============ */
+        .terminal {
+            background: #0a0c10;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-size: 10px; line-height: 1.7;
+            color: var(--text-secondary);
+            max-height: 150px; overflow-y: auto;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .terminal::-webkit-scrollbar { width: 3px; }
+        .terminal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .terminal-line {
+            display: flex; gap: 8px;
+            animation: termLine 0.3s ease;
+            word-break: break-word;
+        }
+
+        @keyframes termLine {
+            from { opacity: 0; transform: translateX(-4px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .term-time { color: var(--text-muted); flex-shrink: 0; }
+        .term-msg { color: var(--accent-green); }
+        .term-msg.warn { color: var(--accent-amber); }
+        .term-msg.info { color: var(--accent-blue); }
+        .term-msg.dim { color: var(--text-muted); }
+        .term-msg.purple { color: var(--accent-purple); }
+
+        .term-cursor {
+            display: inline-block;
+            width: 5px; height: 10px;
+            background: var(--accent-green);
+            animation: blink 1s step-end infinite;
+            vertical-align: middle; margin-left: 2px;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ============ CARDS ============ */
+        .card-item {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            transition: border-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .card-item:hover { border-color: var(--border-hover); }
+        .card-item:active { transform: scale(0.995); }
+
+        .card-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .card-row:first-child { padding-top: 0; }
+
+        .badge-green {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 6px; font-size: 10px; font-weight: 600;
+            background: var(--accent-green-bg);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .badge-slate {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 6px; font-size: 10px; font-weight: 600;
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .badge-amber {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 6px; font-size: 10px; font-weight: 600;
+            background: rgba(245,158,11,0.1);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+
+        .badge-red {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 6px; font-size: 10px; font-weight: 600;
+            background: rgba(239,68,68,0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(239,68,68,0.25);
+        }
+
+        .badge-purple {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 6px; font-size: 10px; font-weight: 600;
+            background: rgba(168,85,247,0.1);
+            color: var(--accent-purple);
+            border: 1px solid rgba(168,85,247,0.25);
+        }
+
+        /* ============ SECTION TITLE ============ */
+        .section-title {
+            font-size: 17px; font-weight: 700; letter-spacing: -0.3px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .section-title .count {
+            font-size: 11px; font-weight: 600;
+            color: var(--text-muted);
+            background: var(--surface-2);
+            padding: 2px 8px; border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        /* ============ SLIDERS ============ */
+        .slider-container { margin-bottom: 14px; }
+
+        .slider-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .slider-label {
+            font-size: 12px; font-weight: 600;
+            color: var(--text-primary);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .slider-label .region-pip {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+
+        .slider-value {
+            font-family: var(--font-mono);
+            font-size: 12px; font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .range-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--surface-2);
+            outline: none;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            border: 3px solid var(--surface-1);
+            box-shadow: 0 0 8px rgba(16,185,129,0.5);
+            cursor: grab;
+            transition: transform 0.15s ease;
+        }
+
+        .range-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.15);
+        }
+
+        .range-slider::-moz-range-thumb {
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            border: 3px solid var(--surface-1);
+            box-shadow: 0 0 8px rgba(16,185,129,0.5);
+            cursor: grab;
+        }
+
+        .range-slider.us-east { background: linear-gradient(90deg, var(--accent-green) 0%, var(--accent-green) var(--val, 33%), var(--surface-2) var(--val, 33%), var(--surface-2) 100%); }
+        .range-slider.eu-central { background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-blue) var(--val, 33%), var(--surface-2) var(--val, 33%), var(--surface-2) 100%); }
+        .range-slider.asia-quantum { background: linear-gradient(90deg, var(--accent-purple) 0%, var(--accent-purple) var(--val, 34%), var(--surface-2) var(--val, 34%), var(--surface-2) 100%); }
+
+        /* ============ OVERCLOCK MODES ============ */
+        .firmware-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .firmware-mode {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .firmware-mode:active { transform: scale(0.96); }
+
+        .firmware-mode.active {
+            background: var(--accent-green-bg);
+            border-color: var(--accent-green);
+            box-shadow: 0 0 12px rgba(16,185,129,0.2);
+        }
+
+        .firmware-mode.active.insane {
+            background: rgba(239,68,68,0.1);
+            border-color: var(--accent-red);
+            box-shadow: 0 0 12px rgba(239,68,68,0.2);
+        }
+
+        .firmware-mode.active.eco {
+            background: rgba(96,165,250,0.1);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 12px rgba(96,165,250,0.2);
+        }
+
+        .firmware-icon {
+            font-size: 16px;
             margin-bottom: 4px;
         }
 
-        .stat-value {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 16px;
+        .firmware-name {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .firmware-multiplier {
+            font-size: 9px;
             font-weight: 600;
-            color: #ffffff;
+            color: var(--accent-green);
+            font-family: var(--font-mono);
+            margin-top: 2px;
         }
 
-        /* Animated Mining Button */
-        .btn-mine {
-            width: 100%;
-            max-width: 400px;
-            padding: 16px;
-            border: none;
-            border-radius: 14px;
-            background: linear-gradient(135deg, #f7931a, #d47a00);
-            color: #fff;
-            font-family: 'Orbitron', sans-serif;
-            font-size: 16px;
-            font-weight: 800;
-            letter-spacing: 1px;
+        .firmware-mode.active.insane .firmware-multiplier { color: var(--accent-red); }
+        .firmware-mode.active.eco .firmware-multiplier { color: var(--accent-blue); }
+
+        /* ============ LEDGER ============ */
+        .ledger-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 0;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            border-bottom: 1px dashed rgba(255,255,255,0.05);
+        }
+
+        .ledger-row:last-child { border-bottom: none; }
+        .ledger-label { color: var(--text-muted); }
+        .ledger-value { color: var(--text-primary); font-weight: 600; }
+        .ledger-value.neg { color: var(--accent-red); }
+        .ledger-value.pos { color: var(--accent-green); }
+
+        /* ============ WORKERS ============ */
+        .worker-item {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .worker-item:last-child { margin-bottom: 0; }
+
+        .worker-item.offline {
+            opacity: 0.5;
+            border-color: rgba(239,68,68,0.2);
+        }
+
+        .worker-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .worker-name {
+            font-size: 12px; font-weight: 700;
+            font-family: var(--font-mono);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .worker-name .worker-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 6px var(--accent-green);
+            animation: pulseDot 1.5s ease-in-out infinite;
+        }
+
+        .worker-item.offline .worker-dot {
+            background: var(--accent-red);
+            box-shadow: 0 0 6px var(--accent-red);
+            animation: none;
+        }
+
+        .worker-metrics {
+            display: flex; gap: 14px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+        }
+
+        .worker-metric-label {
+            color: var(--text-muted);
+            font-size: 9px;
+        }
+
+        .worker-metric-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 34px; height: 20px;
+            background: var(--surface-3);
+            border-radius: 10px;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(247, 147, 26, 0.4);
+            transition: background 0.25s ease;
+            border: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 14px; height: 14px;
+            background: var(--text-muted);
+            border-radius: 50%;
+            transition: transform 0.25s ease, background 0.25s ease;
+        }
+
+        .toggle-switch.on {
+            background: var(--accent-green-bg);
+            border-color: rgba(16,185,129,0.4);
+        }
+
+        .toggle-switch.on::after {
+            transform: translateX(14px);
+            background: var(--accent-green);
+            box-shadow: 0 0 8px rgba(16,185,129,0.6);
+        }
+
+        /* ============ NAVBAR ============ */
+        .navbar {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(9, 11, 16, 0.92);
+            backdrop-filter: blur(24px) saturate(1.2);
+            -webkit-backdrop-filter: blur(24px) saturate(1.2);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around;
+            padding: 10px 0 14px;
+            z-index: 50;
+            box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
+        }
+
+        .nav-link {
+            background: none; border: none;
+            color: var(--text-muted);
+            font-size: 10px; font-weight: 600;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            cursor: pointer;
+            transition: color 0.25s ease, transform 0.2s ease;
+            padding: 4px 12px;
+            border-radius: var(--radius-xs);
+            position: relative;
+        }
+
+        .nav-link.active { color: var(--text-primary); }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute; top: -10px; left: 50%;
+            transform: translateX(-50%);
+            width: 20px; height: 2px;
+            background: var(--accent-green);
+            border-radius: 1px;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .nav-link:active { transform: scale(0.92); }
+
+        .nav-icon {
+            width: 20px; height: 20px;
+            fill: currentColor;
+            transition: fill 0.25s ease;
+        }
+
+        /* ============ MODAL ============ */
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            z-index: 100;
+            align-items: center; justify-content: center;
+            padding: 20px;
+            animation: modalFade 0.25s ease;
+        }
+
+        @keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-body {
+            background: var(--surface-1);
+            border: 1px solid var(--border-hover);
+            border-radius: 20px;
+            padding: 24px 22px 20px;
+            max-width: 380px; width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.03);
+            animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh; overflow-y: auto;
+        }
+
+        .modal-body::-webkit-scrollbar { width: 3px; }
+        .modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: translateY(16px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-icon {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: var(--accent-green-bg);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
             transition: all 0.3s ease;
-            margin-bottom: 15px;
         }
 
-        .btn-mine:active {
-            transform: scale(0.98);
+        .modal-icon svg { width: 22px; height: 22px; fill: var(--accent-green); }
+
+        .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+
+        .modal-desc {
+            font-size: 12.5px; color: var(--text-secondary);
+            line-height: 1.6; margin-bottom: 18px;
         }
 
-        .btn-mine.active {
-            background: linear-gradient(135deg, #e63946, #b71c1c);
-            box-shadow: 0 0 20px rgba(230, 57, 70, 0.4);
+        .modal-warn {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            border-radius: var(--radius-xs);
+            padding: 10px 12px;
+            font-size: 11px; color: var(--accent-amber);
+            text-align: left; line-height: 1.5;
+            margin-bottom: 14px;
+            display: flex; gap: 8px; align-items: flex-start;
         }
 
-        /* Action Buttons */
-        .action-row {
+        .modal-warn svg { width: 14px; height: 14px; fill: var(--accent-amber); flex-shrink: 0; margin-top: 1px; }
+
+        /* ============ NOTIFICATION DRAWER ============ */
+        .notif-drawer {
+            position: fixed;
+            top: 0; right: 0;
+            width: 100%; max-width: 400px;
+            height: 100vh;
+            background: var(--surface-1);
+            border-left: 1px solid var(--border);
+            z-index: 150;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex; flex-direction: column;
+            box-shadow: -20px 0 60px rgba(0,0,0,0.6);
+        }
+
+        .notif-drawer.open { transform: translateX(0); }
+
+        .notif-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(9, 11, 16, 0.5);
+        }
+
+        .notif-title {
+            font-size: 14px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .notif-close {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            width: 30px; height: 30px;
+            border-radius: var(--radius-xs);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px;
+        }
+
+        .notif-close:active { transform: scale(0.94); }
+
+        .notif-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 16px;
+        }
+
+        .notif-list::-webkit-scrollbar { width: 3px; }
+        .notif-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .notif-item {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 8px;
+            animation: notifSlide 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        @keyframes notifSlide {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .notif-item.unread {
+            border-left: 3px solid var(--accent-green);
+            background: linear-gradient(90deg, rgba(16,185,129,0.05) 0%, var(--surface-2) 40%);
+        }
+
+        .notif-item.warn { border-left-color: var(--accent-amber); }
+        .notif-item.danger { border-left-color: var(--accent-red); }
+        .notif-item.info { border-left-color: var(--accent-blue); }
+
+        .notif-item-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .notif-item-title {
+            font-size: 12px; font-weight: 700;
+            color: var(--text-primary);
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .notif-item-time {
+            font-size: 9px; color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        .notif-item-body {
+            font-size: 11px; color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .notif-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* ============ SLIDE-IN TOAST ============ */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 360px;
+        }
+
+        .toast {
+            background: rgba(17, 20, 28, 0.95);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(20px);
             display: flex;
             gap: 10px;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
         }
 
-        .btn-secondary {
-            flex: 1;
-            padding: 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Console Terminal */
-        .terminal {
-            background: #000000;
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            border-radius: 12px;
-            padding: 10px;
-            font-family: monospace;
-            font-size: 11px;
-            height: 100px;
-            overflow-y: hidden;
-            width: 100%;
-            max-width: 400px;
-            color: #00ff88;
+        .toast.out {
+            animation: toastOut 0.3s ease forwards;
         }
 
-        .log-line {
-            margin-bottom: 3px;
-            opacity: 0.8;
+        @keyframes toastOut {
+            to { opacity: 0; transform: translateY(-20px) scale(0.95); }
         }
 
-        /* Popup Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(5px);
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            padding: 20px;
+        .toast-icon {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
         }
 
-        .modal-content {
-            background: #121826;
-            border: 1px solid #f7931a;
-            border-radius: 16px;
-            padding: 25px;
-            max-width: 350px;
-            width: 100%;
-            text-align: center;
+        .toast-icon.green { background: var(--accent-green-bg); }
+        .toast-icon.green svg { fill: var(--accent-green); }
+        .toast-icon.amber { background: rgba(245,158,11,0.15); }
+        .toast-icon.amber svg { fill: var(--accent-amber); }
+        .toast-icon.red { background: rgba(239,68,68,0.15); }
+        .toast-icon.red svg { fill: var(--accent-red); }
+        .toast-icon.blue { background: rgba(96,165,250,0.15); }
+        .toast-icon.blue svg { fill: var(--accent-blue); }
+
+        .toast-icon svg { width: 13px; height: 13px; }
+
+        .toast-content { flex: 1; min-width: 0; }
+
+        .toast-title {
+            font-size: 11px; font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 2px;
         }
 
-        .modal-title {
-            font-family: 'Orbitron', sans-serif;
-            color: #f7931a;
+        .toast-body {
+            font-size: 10px; color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* ============ LEDGER CARD ============ */
+        .profit-bar {
+            display: flex;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            background: var(--surface-2);
+            margin-bottom: 12px;
+        }
+
+        .profit-bar-seg {
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+
+        .profit-bar-seg.gross { background: linear-gradient(90deg, var(--accent-green), #34d399); }
+        .profit-bar-seg.power { background: var(--accent-amber); }
+        .profit-bar-seg.fee { background: var(--accent-red); }
+
+        .profit-legend {
+            display: flex;
+            gap: 12px;
+            font-size: 9px;
+            font-family: var(--font-mono);
             margin-bottom: 10px;
         }
 
-        .modal-btn {
-            margin-top: 15px;
-            padding: 10px 20px;
-            background: #f7931a;
-            border: none;
-            border-radius: 8px;
-            color: #000;
-            font-weight: bold;
+        .profit-legend-item {
+            display: flex; align-items: center; gap: 4px;
+            color: var(--text-muted);
+        }
+
+        .profit-legend-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+
+        /* ============ WALLET CONNECT ============ */
+        .wallet-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+        .wallet-option {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .wallet-option:active { transform: scale(0.97); border-color: var(--accent-green); background: var(--surface-3); }
+
+        .wallet-logo {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+
+        .wallet-logo.mm { background: rgba(246, 133, 27, 0.15); }
+        .wallet-logo.ph { background: rgba(171, 155, 248, 0.15); }
+        .wallet-logo.cb { background: rgba(0, 82, 255, 0.15); }
+
+        .wallet-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .wallet-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+        /* ============ AML GATEWAY ============ */
+        .gateway-box {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 14px;
+            text-align: left;
+        }
+
+        .gateway-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 6px 0;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .gateway-row:last-child { border-bottom: none; }
+        .gateway-label { color: var(--text-muted); }
+        .gateway-value { color: var(--text-primary); font-weight: 600; }
+        .gateway-value.green { color: var(--accent-green); }
+        .gateway-value.amber { color: var(--accent-amber); }
+        .gateway-value.red { color: var(--accent-red); }
+
+        .countdown-display {
+            font-family: var(--font-mono);
+            font-size: 22px; font-weight: 700;
+            color: var(--accent-amber);
+            text-align: center;
+            padding: 10px 0;
+            letter-spacing: 2px;
+            background: rgba(245, 158, 11, 0.05);
+            border-radius: var(--radius-xs);
+            border: 1px solid rgba(245, 158, 11, 0.15);
+            margin-bottom: 14px;
+        }
+
+        .qr-placeholder {
+            width: 100px; height: 100px;
+            margin: 0 auto 12px;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 6px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .qr-placeholder svg { width: 100%; height: 100%; }
+
+        .deposit-address {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            padding: 8px 10px;
+            font-family: var(--font-mono);
+            font-size: 9px; color: var(--text-secondary);
+            word-break: break-all; text-align: center;
+            margin-bottom: 12px; letter-spacing: 0.3px;
+        }
+
+        .receipt {
+            background: #0a0c10;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            padding: 10px 12px;
+            font-family: var(--font-mono);
+            font-size: 9.5px; text-align: left;
+            margin-bottom: 14px;
+            color: var(--text-muted); line-height: 1.7;
+        }
+
+        .receipt .line { display: flex; justify-content: space-between; }
+        .receipt .line .val { color: var(--text-secondary); }
+        .receipt .line .val.green { color: var(--accent-green); }
+        .receipt .line .val.amber { color: var(--accent-amber); }
+
+        /* ============ REF TIER ============ */
+        .ref-tier {
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 12px;
+            background: var(--surface-2);
+            border-radius: var(--radius-xs);
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .ref-tier:last-child { margin-bottom: 0; }
+
+        .tier-badge {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; flex-shrink: 0;
+        }
+
+        .tier-1 { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.25); }
+        .tier-2 { background: rgba(96, 165, 250, 0.12); color: var(--accent-blue); border: 1px solid rgba(96, 165, 250, 0.2); }
+        .tier-3 { background: rgba(245, 158, 11, 0.1); color: var(--accent-amber); border: 1px solid rgba(245, 158, 11, 0.2); }
+
+        .copy-field { display: flex; gap: 8px; align-items: center; }
+
+        .copy-field input {
+            flex: 1;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            padding: 10px 12px;
+            font-size: 11px; color: var(--text-secondary);
+            font-family: var(--font-mono);
+            outline: none; min-width: 0;
+        }
+
+        .live-dot {
+            display: inline-block;
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 6px var(--accent-green);
+            animation: pulseDot 1.5s ease-in-out infinite;
+            margin-right: 4px;
+        }
+
+        .rank-up { color: var(--accent-green); font-size: 10px; font-weight: 600; }
+
+        /* ============ POOL ROUTING SUMMARY ============ */
+        .pool-summary {
+            background: linear-gradient(135deg, rgba(16,185,129,0.05) 0%, var(--surface-1) 60%);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-top: 4px;
+        }
+
+        .pool-dist-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: var(--surface-2);
+            margin: 10px 0;
+        }
+
+        .pool-dist-seg { height: 100%; transition: width 0.4s ease; }
+        .pool-dist-seg.us { background: linear-gradient(90deg, #10b981, #34d399); }
+        .pool-dist-seg.eu { background: linear-gradient(90deg, #60a5fa, #93c5fd); }
+        .pool-dist-seg.asia { background: linear-gradient(90deg, #a855f7, #c084fc); }
+
+        .pool-dist-legend {
+            display: flex;
+            gap: 12px;
+            font-size: 9px;
+            font-family: var(--font-mono);
+        }
+
+        .pool-dist-legend-item {
+            display: flex; align-items: center; gap: 4px;
+            color: var(--text-muted);
+        }
+
+        .pool-dist-legend-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+
+        /* Modal close */
+        .modal-close-btn {
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
-    <div class="header">
-        <div style="display:flex; align-items:center; gap:8px;">
-            <span style="font-size:22px;">₿</span>
-            <span style="font-weight:700; font-size:18px;">ANTMINER S21</span>
+    <!-- ============ HEADER ============ -->
+    <header class="header">
+        <div class="brand">
+            <div class="brand-icon">V</div>
+            <div>
+                <div class="brand-title">VALENCE</div>
+                <div class="brand-sub">Cloud Protocol</div>
+            </div>
         </div>
-        <span class="badge" id="statusBadge">OFFLINE</span>
-    </div>
-
-    <!-- Main Balance Card -->
-    <div class="card balance-container">
-        <div class="balance-title">Unconfirmed Balance</div>
-        <div class="btc-balance" id="btcVal">0.00000000</div>
-        <div class="usd-balance">≈ $<span id="usdVal">0.00</span> USD</div>
-    </div>
-
-    <!-- Mining Stats -->
-    <div class="stats-grid">
-        <div class="stat-box">
-            <div class="stat-label">HASHRATE</div>
-            <div class="stat-value" id="hashVal">0.00 TH/s</div>
+        <div class="header-actions">
+            <button class="notif-btn" onclick="openNotifDrawer()" id="notifBtn">
+                <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                <span class="notif-badge" id="notifBadge">3</span>
+            </button>
+            <button class="wallet-btn" onclick="openWalletModal()" id="walletBtn">
+                <span class="wallet-dot" id="walletDot"></span>
+                <span id="walletLabel">Connect</span>
+            </button>
         </div>
-        <div class="stat-box">
-            <div class="stat-label">TEMP / POWER</div>
-            <div class="stat-value" id="tempVal">32°C / 0W</div>
+    </header>
+
+    <!-- ============ MARKET TICKER ============ -->
+    <div class="market-ticker">
+        <div class="ticker-item">
+            <span class="live-pip"></span>
+            <span class="ticker-label">BTC/USDT</span>
+            <span class="ticker-value" id="tickerPrice">$--,---.--</span>
+            <span class="ticker-value" id="tickerChange">--.--%</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-label">Block</span>
+            <span class="ticker-value" id="tickerBlock">#---,---</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-label">Diff</span>
+            <span class="ticker-value" id="tickerDiff">--.--T</span>
+        </div>
+        <div class="ticker-item">
+            <span class="ticker-label">Net</span>
+            <span class="ticker-value" id="tickerNet">-- EH/s</span>
         </div>
     </div>
 
-    <!-- Start Button -->
-    <button class="btn-mine" id="mineBtn" onclick="toggleMining()">START CLOUD MINING</button>
+    <!-- ==================== DASHBOARD ==================== -->
+    <main class="page active" id="page-dashboard">
+        <div class="hero-card" id="heroCard">
+            <div class="status-badge" id="statusBadge">
+                <span class="status-dot"></span>
+                <span id="statusText">Node Idle</span>
+            </div>
+            <div class="balance-label">Unconfirmed Earnings</div>
+            <div class="balance-value" id="btcVal">0.00000000</div>
+            <div class="balance-sub">≈ $<span id="usdVal">0.00</span> USD</div>
+            <button class="primary-btn" id="toggleBtn" onclick="toggleMining()">Start Allocation</button>
+        </div>
 
-    <!-- Quick Actions -->
-    <div class="action-row">
-        <button class="btn-secondary" onclick="showPopup('Withdrawal Lock', 'Minimum withdrawal threshold is 0.05000000 BTC. Keep mining to unlock direct transfer.')">⚡ WITHDRAW</button>
-        <button class="btn-secondary" onclick="showPopup('Boost Hashrate', 'Cloud node allocation full for today. Try again in 24 hours.')">🚀 BOOST 2X</button>
-    </div>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Hashrate</div>
+                <div class="metric-value" id="hashVal">0.0 TH/s</div>
+                <div class="metric-sub" id="hashSub">—</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Core Temp</div>
+                <div class="metric-value" id="tempVal">32°C</div>
+                <div class="metric-sub" id="tempSub">Idle</div>
+            </div>
+        </div>
 
-    <!-- Live Terminal -->
-    <div class="terminal" id="terminal">
-        <div class="log-line">> System initialized. Ready to connect to pool...</div>
-    </div>
+        <div class="metrics-grid three">
+            <div class="metric-card">
+                <div class="metric-label">Power Draw</div>
+                <div class="metric-value" id="powerVal" style="font-size:14px;">0 W</div>
+                <div class="telem-bar"><div class="telem-fill" id="powerBar" style="width:0%"></div></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Fan Speed</div>
+                <div class="metric-value" id="fanVal" style="font-size:14px;">0 RPM</div>
+                <div class="telem-bar"><div class="telem-fill" id="fanBar" style="width:0%"></div></div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Latency</div>
+                <div class="metric-value" id="pingVal" style="font-size:14px;">-- ms</div>
+                <div class="metric-sub muted" id="nodeVal">FRA-Node-4</div>
+            </div>
+        </div>
 
-    <!-- Prank Modal -->
+        <!-- ============ LIVE PROFITABILITY LEDGER ============ -->
+        <div class="card-item" style="padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Live Profitability Ledger</div>
+                <span class="badge-green" style="font-size:9px;">REAL-TIME</span>
+            </div>
+            <div class="profit-bar">
+                <div class="profit-bar-seg gross" id="segGross" style="width:70%"></div>
+                <div class="profit-bar-seg power" id="segPower" style="width:22%"></div>
+                <div class="profit-bar-seg fee" id="segFee" style="width:8%"></div>
+            </div>
+            <div class="profit-legend">
+                <div class="profit-legend-item"><span class="profit-legend-dot" style="background:var(--accent-green)"></span>Gross Yield</div>
+                <div class="profit-legend-item"><span class="profit-legend-dot" style="background:var(--accent-amber)"></span>Power Cost</div>
+                <div class="profit-legend-item"><span class="profit-legend-dot" style="background:var(--accent-red)"></span>Pool Fee</div>
+            </div>
+            <div class="ledger-row">
+                <span class="ledger-label">Gross Yield Rate</span>
+                <span class="ledger-value pos" id="ledgerGross">+0.00000000 BTC/hr</span>
+            </div>
+            <div class="ledger-row">
+                <span class="ledger-label">Power Cost (0.082 $/kWh)</span>
+                <span class="ledger-value neg" id="ledgerPower">-0.00000000 BTC/hr</span>
+            </div>
+            <div class="ledger-row">
+                <span class="ledger-label">Pool Maintenance (1.0%)</span>
+                <span class="ledger-value neg" id="ledgerFee">-0.00000000 BTC/hr</span>
+            </div>
+            <div class="ledger-row" style="border-top: 1px solid var(--border); padding-top:10px; margin-top:6px;">
+                <span class="ledger-label" style="color:var(--text-primary); font-weight:700;">NET HOURLY PROFIT</span>
+                <span class="ledger-value pos" id="ledgerNet" style="font-size:12px;">+0.00000000 BTC/hr</span>
+            </div>
+        </div>
+
+        <!-- ============ HARDWARE TELEMETRY ============ -->
+        <div class="card-item" style="padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Hardware Telemetry</div>
+                <div style="font-size:10px; color:var(--accent-green); font-family:var(--font-mono);" id="uptimeVal">00:00:00</div>
+            </div>
+            <div class="fan-row">
+                <svg class="fan-icon" id="fanIcon" viewBox="0 0 24 24"><path d="M12 11c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2h2c0-2.21-1.79-4-4-4zm0-4c-4.42 0-8 3.58-8 8h2c0-3.31 2.69-6 6-6s6 2.69 6 6h2c0-4.42-3.58-8-8-8z"/></svg>
+                <div style="flex:1;">
+                    <div style="font-size:11px; font-weight:600;" id="fanStatusText">Cooling Fan: Idle</div>
+                    <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono);" id="fanDetail">0 RPM • 0.0 CFM</div>
+                </div>
+                <span class="badge-slate" id="fanBadge">IDLE</span>
+            </div>
+        </div>
+
+        <!-- ============ TERMINAL ============ -->
+        <div class="terminal" id="terminal">
+            <div class="terminal-line">
+                <span class="term-time">[--:--:--]</span>
+                <span class="term-msg info">VALENCE OS v4.2.1 — Secure enclave initialized</span>
+            </div>
+            <div class="terminal-line">
+                <span class="term-time">[--:--:--]</span>
+                <span class="term-msg">Stratum v2 handshake → btc.valence.io:3333</span>
+            </div>
+            <div class="terminal-line">
+                <span class="term-time">[--:--:--]</span>
+                <span class="term-msg dim">Binance WebSocket feed connected</span>
+            </div>
+            <div class="terminal-line">
+                <span class="term-time">[--:--:--]</span>
+                <span class="term-msg warn">Awaiting allocation command...</span>
+                <span class="term-cursor"></span>
+            </div>
+        </div>
+
+        <button class="secondary-btn" style="padding: 14px;" onclick="withdrawFunds()">Withdraw Funds</button>
+    </main>
+
+    <!-- ==================== CLUSTERS / RIGS ==================== -->
+    <main class="page" id="page-rigs">
+        <div class="section-title">
+            Hardware Store
+            <span class="count">4 nodes</span>
+        </div>
+
+        <div class="card-item" style="margin-top:4px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                <div>
+                    <div style="font-weight:700; font-size:14px;">Antminer S21 Pro</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Standard Enterprise Allocation</div>
+                </div>
+                <span class="badge-green">Active</span>
+            </div>
+            <div style="display:flex; gap:16px; margin-bottom:14px;">
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">HASHRATE</div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono);" id="rigHash">234 TH/s</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">POWER</div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono);">3510W</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">EFFICIENCY</div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:var(--accent-green);">15 J/TH</div>
+                </div>
+            </div>
+            <button class="secondary-btn" onclick="haptic('light'); showModal('Node Active', 'Antminer S21 Pro is currently allocated and generating hashrate on your account.', 'check')">Deployed</button>
+        </div>
+
+        <!-- ============ FIRMWARE MODES ============ -->
+        <div class="card-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">ASIC Firmware Mode</div>
+                <span class="badge-slate" id="firmwareBadge">BALANCED</span>
+            </div>
+            <div class="firmware-grid">
+                <div class="firmware-mode eco" onclick="setFirmware('eco')" id="fw-eco">
+                    <div class="firmware-icon">❄️</div>
+                    <div class="firmware-name">Eco</div>
+                    <div class="firmware-multiplier">-15% TH</div>
+                </div>
+                <div class="firmware-mode active" onclick="setFirmware('balanced')" id="fw-balanced">
+                    <div class="firmware-icon">⚖️</div>
+                    <div class="firmware-name">Balanced</div>
+                    <div class="firmware-multiplier">1.0x</div>
+                </div>
+                <div class="firmware-mode insane" onclick="setFirmware('insane')" id="fw-insane">
+                    <div class="firmware-icon">🔥</div>
+                    <div class="firmware-name">Insane</div>
+                    <div class="firmware-multiplier">+35% TH</div>
+                </div>
+            </div>
+            <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono); padding:8px; background:var(--surface-2); border-radius:var(--radius-xs);" id="firmwareDesc">
+                Balanced mode: Stable performance with optimal thermal envelope.
+            </div>
+        </div>
+
+        <!-- ============ STRATUM POOL MULTI-ROUTING ============ -->
+        <div class="card-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Stratum v2 Pool Routing</div>
+                <span class="badge-green" style="font-size:9px;">AUTO</span>
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-header">
+                    <div class="slider-label">
+                        <span class="region-pip" style="background:var(--accent-green);"></span>
+                        US-East (Ashburn)
+                    </div>
+                    <span class="slider-value" id="sliderUsVal">34%</span>
+                </div>
+                <input type="range" class="range-slider us-east" id="sliderUs" min="0" max="100" value="34" oninput="onPoolSlider('us')">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-header">
+                    <div class="slider-label">
+                        <span class="region-pip" style="background:var(--accent-blue);"></span>
+                        EU-Central (Frankfurt)
+                    </div>
+                    <span class="slider-value" id="sliderEuVal" style="color:var(--accent-blue);">33%</span>
+                </div>
+                <input type="range" class="range-slider eu-central" id="sliderEu" min="0" max="100" value="33" oninput="onPoolSlider('eu')">
+            </div>
+
+            <div class="slider-container" style="margin-bottom:6px;">
+                <div class="slider-header">
+                    <div class="slider-label">
+                        <span class="region-pip" style="background:var(--accent-purple);"></span>
+                        Asia-Quantum (Singapore)
+                    </div>
+                    <span class="slider-value" id="sliderAsiaVal" style="color:var(--accent-purple);">33%</span>
+                </div>
+                <input type="range" class="range-slider asia-quantum" id="sliderAsia" min="0" max="100" value="33" oninput="onPoolSlider('asia')">
+            </div>
+
+            <div class="pool-summary">
+                <div style="display:flex; justify-content:space-between; font-size:10px; font-family:var(--font-mono); color:var(--text-muted);">
+                    <span>DISTRIBUTION</span>
+                    <span id="poolTotal">100%</span>
+                </div>
+                <div class="pool-dist-bar">
+                    <div class="pool-dist-seg us" id="distUs" style="width:34%"></div>
+                    <div class="pool-dist-seg eu" id="distEu" style="width:33%"></div>
+                    <div class="pool-dist-seg asia" id="distAsia" style="width:33%"></div>
+                </div>
+                <div class="pool-dist-legend">
+                    <div class="pool-dist-legend-item"><span class="pool-dist-legend-dot" style="background:#10b981"></span>US <span id="legendUs">34%</span></div>
+                    <div class="pool-dist-legend-item"><span class="pool-dist-legend-dot" style="background:#60a5fa"></span>EU <span id="legendEu">33%</span></div>
+                    <div class="pool-dist-legend-item"><span class="pool-dist-legend-dot" style="background:#a855f7"></span>ASIA <span id="legendAsia">33%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-item">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+                <div>
+                    <div style="font-weight:700; font-size:14px;">Quantum Hydro Container</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Liquid Cooled Industrial Cluster</div>
+                </div>
+                <span class="badge-slate">Locked</span>
+            </div>
+            <div style="display:flex; gap:16px; margin-bottom:14px;">
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">HASHRATE</div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono);">850 TH/s</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">POWER</div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono);">11.9kW</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">EFFICIENCY</div>
+                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:var(--accent-green);">14 J/TH</div>
+                </div>
+            </div>
+            <button class="secondary-btn" onclick="haptic('medium'); showModal('Allocation Full', 'Quantum Hydro Container allocation is currently full. Next node slot opens in 6 hours.', 'warn')">Upgrade — 0.025 BTC</button>
+        </div>
+    </main>
+
+    <!-- ==================== WORKERS (NEW 5th page as sub-screen of Clusters) ==================== -->
+    <main class="page" id="page-workers">
+        <div class="section-title">
+            Worker Nodes
+            <span class="count"><span class="live-dot"></span><span id="workerOnlineCount">4 online</span></span>
+        </div>
+
+        <div id="workerList" style="margin-top:4px;">
+            <!-- Workers injected by JS -->
+        </div>
+
+        <div class="card-item" style="background: linear-gradient(135deg, rgba(168,85,247,0.06) 0%, var(--surface-1) 60%); border-color: rgba(168,85,247,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div>
+                    <div style="font-weight:700; font-size:13px;">Deploy New Worker</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Add additional S21 instance</div>
+                </div>
+                <span class="badge-purple" style="font-size:10px;">+1 worker</span>
+            </div>
+            <button class="secondary-btn" style="background:var(--surface-2);" onclick="haptic('medium'); showModal('Deployment Queue', 'New worker deployment is queued. Hardware provisioning typically takes 4-6 hours. You will receive a notification when your worker comes online.', 'warn')">Request Deployment</button>
+        </div>
+    </main>
+
+    <!-- ==================== NETWORK / REFERRALS ==================== -->
+    <main class="page" id="page-network">
+        <div class="section-title">
+            Affiliate Network
+            <span class="count">Tier 1–3</span>
+        </div>
+
+        <div class="card-item" style="margin-top:4px;">
+            <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:10px;">Your Referral Link</div>
+            <div class="copy-field">
+                <input type="text" id="refLink" value="t.me/BitcoinMinnerBot?start=ref_anax99" readonly>
+                <button class="secondary-btn small accent" onclick="copyRef()" id="copyBtn">Copy</button>
+            </div>
+            <div style="display:flex; gap:16px; margin-top:14px;">
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">REFERRALS</div>
+                    <div style="font-size:16px; font-weight:700; font-family:var(--font-mono);">0</div>
+                </div>
+                <div>
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">EARNED</div>
+                    <div style="font-size:16px; font-weight:700; font-family:var(--font-mono); color:var(--accent-green);">0.00000000</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-item">
+            <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:12px;">Commission Structure</div>
+            <div class="ref-tier">
+                <div class="tier-badge tier-1">1</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px; font-weight:600;">Tier 1 — Direct</div>
+                    <div style="font-size:11px; color:var(--text-muted);">12% of referred mining yield</div>
+                </div>
+                <div style="font-size:13px; font-weight:700; font-family:var(--font-mono); color:var(--accent-green);">12%</div>
+            </div>
+            <div class="ref-tier">
+                <div class="tier-badge tier-2">2</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px; font-weight:600;">Tier 2 — Extended</div>
+                    <div style="font-size:11px; color:var(--text-muted);">5% of sub-network yield</div>
+                </div>
+                <div style="font-size:13px; font-weight:700; font-family:var(--font-mono); color:var(--accent-blue);">5%</div>
+            </div>
+            <div class="ref-tier">
+                <div class="tier-badge tier-3">3</div>
+                <div style="flex:1;">
+                    <div style="font-size:13px; font-weight:600;">Tier 3 — Network</div>
+                    <div style="font-size:11px; color:var(--text-muted);">2% of extended network yield</div>
+                </div>
+                <div style="font-size:13px; font-weight:700; font-family:var(--font-mono); color:var(--accent-amber);">2%</div>
+            </div>
+        </div>
+
+        <div class="card-item" style="background: linear-gradient(135deg, rgba(16,185,129,0.06) 0%, var(--surface-1) 60%); border-color: rgba(16,185,129,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div>
+                    <div style="font-weight:700; font-size:14px;">Daily Airdrop</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Claim once every 24 hours</div>
+                </div>
+                <span class="badge-green" style="font-size:11px;">+0.00005 BTC</span>
+            </div>
+            <button class="secondary-btn accent" onclick="claimAirdrop()" id="airdropBtn">Claim Airdrop</button>
+        </div>
+    </main>
+
+    <!-- ==================== LEADERBOARD ==================== -->
+    <main class="page" id="page-ranks">
+        <div class="section-title">
+            Top Miners
+            <span class="count"><span class="live-dot"></span>Live</span>
+        </div>
+
+        <div class="card-item" style="margin-top:4px;">
+            <div class="card-row">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--accent-amber); font-family:var(--font-mono); width:20px;">#1</span>
+                    <div>
+                        <div style="font-size:13px; font-weight:600;">Satoshi_Pool</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Global Elite Miner</div>
+                    </div>
+                </div>
+                <span style="font-size:13px; font-weight:700; font-family:var(--font-mono);">412.50 BTC</span>
+            </div>
+            <div class="card-row">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--text-secondary); font-family:var(--font-mono); width:20px;">#2</span>
+                    <div>
+                        <div style="font-size:13px; font-weight:600;">Apex_Node</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Enterprise Cluster</div>
+                    </div>
+                </div>
+                <span style="font-size:13px; font-weight:700; font-family:var(--font-mono);">289.10 BTC</span>
+            </div>
+            <div class="card-row">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:12px; font-weight:700; color:#cd7f32; font-family:var(--font-mono); width:20px;">#3</span>
+                    <div>
+                        <div style="font-size:13px; font-weight:600;">HashLord_X</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Hydro Container Farm</div>
+                    </div>
+                </div>
+                <span style="font-size:13px; font-weight:700; font-family:var(--font-mono);">156.82 BTC</span>
+            </div>
+            <div class="card-row" style="border-top: 1px solid rgba(16,185,129,0.15); margin-top:4px; padding-top:12px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:12px; font-weight:700; color:var(--accent-green); font-family:var(--font-mono); width:20px;">#47</span>
+                    <div>
+                        <div style="font-size:13px; font-weight:600; color:var(--accent-green);">You (Anax)</div>
+                        <div style="font-size:10px; color:var(--text-muted);">Active Miner</div>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-size:13px; font-weight:700; font-family:var(--font-mono); color:var(--accent-green);" id="rankBtc">0.00000000 BTC</span>
+                    <div class="rank-up" id="rankUp"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Global Hashrate</div>
+                <div class="metric-value" style="font-size:15px;" id="globalHash">642.1 EH/s</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Active Miners</div>
+                <div class="metric-value" style="font-size:15px;">1.2M</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ==================== NAVBAR ==================== -->
+    <nav class="navbar">
+        <button class="nav-link active" onclick="navigate('dashboard', this)" id="nav-dashboard">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Mining
+        </button>
+        <button class="nav-link" onclick="navigate('rigs', this)" id="nav-rigs">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            Clusters
+        </button>
+        <button class="nav-link" onclick="navigate('workers', this)" id="nav-workers">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
+            Workers
+        </button>
+        <button class="nav-link" onclick="navigate('network', this)" id="nav-network">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Network
+        </button>
+        <button class="nav-link" onclick="navigate('ranks', this)" id="nav-ranks">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 15l-2 5 9-11h-5l2-5-9 11h5z"/></svg>
+            Ranks
+        </button>
+    </nav>
+
+    <!-- ==================== MODAL ==================== -->
     <div class="modal" id="modal">
-        <div class="modal-content">
-            <h3 class="modal-title" id="mTitle">Alert</h3>
-            <p id="mText" style="color:#ccc; font-size:14px; line-height:1.4;"></p>
-            <button class="modal-btn" onclick="closePopup()">ACKNOWLEDGE</button>
+        <div class="modal-body">
+            <div class="modal-icon" id="modalIcon">
+                <svg viewBox="0 0 24 24" id="modalIconSvg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+            <div class="modal-title" id="mTitle">Notice</div>
+            <div class="modal-desc" id="mDesc">Description goes here.</div>
+            <div id="modalExtra"></div>
+            <button class="secondary-btn modal-close-btn" onclick="closeModal()" id="modalCloseBtn">Dismiss</button>
         </div>
     </div>
+
+    <!-- ==================== NOTIFICATION DRAWER ==================== -->
+    <div class="notif-drawer" id="notifDrawer">
+        <div class="notif-header">
+            <div class="notif-title">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:var(--accent-green);"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                Notifications
+            </div>
+            <button class="notif-close" onclick="closeNotifDrawer()">✕</button>
+        </div>
+        <div class="notif-list" id="notifList"></div>
+    </div>
+
+    <!-- ==================== TOAST CONTAINER ==================== -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+        // ============================================================
+        // TELEGRAM WEBAPP INIT
+        // ============================================================
+        const tg = window.Telegram?.WebApp || {};
+        try { tg.expand?.(); } catch(e) {}
+        try { tg.setHeaderColor?.('#090b10'); } catch(e) {}
+        try { tg.setBackgroundColor?.('#090b10'); } catch(e) {}
 
-        let isMining = false;
+        // ============================================================
+        // STATE
+        // ============================================================
+        let active = false;
         let btc = 0.00000000;
-        let btcPrice = 67500; // Simulated BTC Price
-        let timer = null;
+        let btcPrice = 69500;
+        let priceChangePct = 0;
+        let blockHeight = 872_341;
+        let networkDiff = 92.67;
+        let networkHashrate = 642.1;
+        let uptimeSeconds = 0;
+        let walletConnected = false;
+        let airdropClaimed = false;
+        let miningStartTime = null;
 
-        function toggleMining() {
-            let btn = document.getElementById('mineBtn');
-            let badge = document.getElementById('statusBadge');
+        // Firmware mode
+        let firmwareMode = 'balanced';
+        const FIRMWARE_CONFIG = {
+            eco:      { hashrateMult: 0.85, powerMult: 0.75, tempBase: 52, risk: 0.00, label: 'ECO' },
+            balanced: { hashrateMult: 1.00, powerMult: 1.00, tempBase: 62, risk: 0.00, label: 'BALANCED' },
+            insane:   { hashrateMult: 1.35, powerMult: 1.45, tempBase: 74, risk: 0.015, label: 'INSANE' }
+        };
 
-            if(!isMining) {
-                isMining = true;
-                btn.innerText = "STOP MINING RIG";
-                btn.classList.add('active');
-                badge.innerText = "MINING LIVE";
-                badge.style.background = "linear-gradient(45deg, #00ff88, #00b894)";
-                addLog("Connecting to Stratum Pool: btc.slushpool.com:3333...");
-                
-                timer = setInterval(() => {
-                    btc += 0.00000018 + (Math.random() * 0.00000005);
-                    document.getElementById('btcVal').innerText = btc.toFixed(8);
-                    document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
-                    
-                    let hash = (42 + Math.random() * 5.5).toFixed(1);
-                    document.getElementById('hashVal').innerText = hash + " TH/s";
+        // Pool routing (percentages, must sum ~100)
+        let poolUs = 34;
+        let poolEu = 33;
+        let poolAsia = 33;
 
-                    let temp = Math.floor(64 + Math.random() * 6);
-                    let watt = Math.floor(1320 + Math.random() * 40);
-                    document.getElementById('tempVal').innerText = temp + "°C / " + watt + "W";
+        // Live profitability
+        const ELECTRICITY_RATE = 0.082; // $/kWh
+        const POOL_FEE_PCT = 0.01; // 1%
+        let grossYieldBTC = 0;
+        let powerCostBTC = 0;
+        let poolFeeBTC = 0;
+        let netProfitBTC = 0;
 
-                    if(Math.random() > 0.6) {
-                        let blocks = [840120, 840121, 840122, 840123];
-                        let randomBlock = blocks[Math.floor(Math.random()*blocks.length)];
-                        addLog("[SUCCESS] Shares accepted for Block #" + randomBlock);
-                    }
-                }, 800);
-            } else {
-                isMining = false;
-                clearInterval(timer);
-                btn.innerText = "START CLOUD MINING";
-                btn.classList.remove('active');
-                badge.innerText = "OFFLINE";
-                badge.style.background = "linear-gradient(45deg, #f7931a, #ffb703)";
-                document.getElementById('hashVal').innerText = "0.00 TH/s";
-                document.getElementById('tempVal').innerText = "32°C / 0W";
-                addLog("Mining paused by user.");
+        // Workers
+        let workers = [
+            { id: 'S21_01', name: 'Worker_S21_01', online: true, hashrate: 234.2, ping: 12, temp: 63, node: 'FRA-Node-4' },
+            { id: 'S21_02', name: 'Worker_S21_02', online: true, hashrate: 233.8, ping: 18, temp: 64, node: 'FRA-Node-4' },
+            { id: 'S21_03', name: 'Worker_S21_03', online: true, hashrate: 234.5, ping: 24, temp: 62, node: 'AMS-Node-2' },
+            { id: 'S21_04', name: 'Worker_S21_04', online: false, hashrate: 0, ping: 0, temp: 0, node: '—' }
+        ];
+
+        // Notifications
+        let notifications = [
+            { id: 1, title: 'Pool Round #8420 Initiated', body: 'Payout round #8420 initiated. Expected completion in ~24 min.', type: 'info', time: '2m ago', unread: true },
+            { id: 2, title: 'High Thermal Spike', body: 'High thermal spike detected on Node #3. Temp reached 78°C. Cooling fan ramped to 3800 RPM.', type: 'warn', time: '8m ago', unread: true },
+            { id: 3, title: 'New Block Mined', body: 'Block #872,341 mined by network. Difficulty adjustment window approaching.', type: 'info', time: '12m ago', unread: true }
+        ];
+
+        // Terminal log messages
+        const LOG_MESSAGES = [
+            { msg: 'Share accepted → pool diff 12.8T', type: '' },
+            { msg: 'Nonce range scanned — 0x3A4F2C1B', type: 'info' },
+            { msg: 'Block candidate found → validating...', type: '' },
+            { msg: 'Stratum: new job received from pool', type: 'info' },
+            { msg: 'GPU/ASIC temp normalized — 64°C', type: '' },
+            { msg: 'Hashrate spike detected +4.2 TH/s', type: '' },
+            { msg: 'Payout threshold progress: 0.0000%', type: 'warn' },
+            { msg: 'Merkle root verified — share submitted', type: '' },
+            { msg: 'Network difficulty adjustment: +0.8%', type: 'info' },
+            { msg: 'Ping: 12ms to Frankfurt-Node-4', type: 'dim' },
+            { msg: 'Ping: 24ms to Amsterdam-Node-2', type: 'dim' },
+            { msg: 'Stratum v2: noise handshake verified', type: 'info' },
+            { msg: 'Accepted share → difficulty 12.8T', type: '' },
+            { msg: 'ASIC boost enabled — efficiency +12%', type: '' },
+            { msg: 'Cooling loop pressure nominal — 2.4 bar', type: 'dim' },
+            { msg: 'Rejected share → stale job (1/1240)', type: 'warn' },
+            { msg: 'Block template updated — txns: 2,847', type: 'info' },
+            { msg: 'Fan RPM normalized — 3420 RPM', type: 'dim' },
+            { msg: 'Stratum v2 routing: US 34% / EU 33% / ASIA 33%', type: 'purple' },
+            { msg: 'Gas fee ledger updated: -0.00000021 BTC', type: 'dim' },
+        ];
+
+        const NODES = ['FRA-Node-4', 'AMS-Node-2', 'LON-Node-1', 'SGP-Node-7', 'TYO-Node-3', 'NYC-Node-5'];
+
+        // Intervals
+        let loop = null;
+        let termInterval = null;
+        let telemetryInterval = null;
+        let marketInterval = null;
+        let blockInterval = null;
+        let countdownInterval = null;
+        let uptimeInterval = null;
+        let rankInterval = null;
+        let ledgerInterval = null;
+        let workerInterval = null;
+        let notifInterval = null;
+
+        // Audio
+        let audioCtx = null;
+        let fanOscillator = null;
+        let fanGain = null;
+
+        // ============================================================
+        // BINANCE LIVE PRICE
+        // ============================================================
+        async function fetchBinancePrice() {
+            try {
+                const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbol=BTCUSDT');
+                const data = await res.json();
+                btcPrice = parseFloat(data.lastPrice);
+                priceChangePct = parseFloat(data.priceChangePercent);
+                updateMarketTicker();
+                document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+            } catch (e) {
+                btcPrice += (Math.random() - 0.5) * 15;
+                updateMarketTicker();
             }
         }
 
-        function addLog(text) {
-            let term = document.getElementById('terminal');
-            let line = document.createElement('div');
-            line.className = 'log-line';
-            line.innerText = "> " + text;
+        function updateMarketTicker() {
+            const priceEl = document.getElementById('tickerPrice');
+            const changeEl = document.getElementById('tickerChange');
+            priceEl.innerText = '$' + btcPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (priceChangePct >= 0) {
+                changeEl.innerText = '+' + priceChangePct.toFixed(2) + '%';
+                changeEl.className = 'ticker-value up';
+            } else {
+                changeEl.innerText = priceChangePct.toFixed(2) + '%';
+                changeEl.className = 'ticker-value down';
+            }
+        }
+
+        function startMarketFeed() {
+            fetchBinancePrice();
+            marketInterval = setInterval(fetchBinancePrice, 3000);
+        }
+
+        function startBlockSimulation() {
+            blockInterval = setInterval(() => {
+                if (Math.random() < 0.008) {
+                    blockHeight++;
+                    document.getElementById('tickerBlock').innerText = '#' + blockHeight.toLocaleString();
+                    addTerminalLog(`New block #${blockHeight.toLocaleString()} mined — difficulty window`, 'info');
+                    pushNotification('New Block Mined', `Block #${blockHeight.toLocaleString()} has been mined by the network. Difficulty adjustment window active.`, 'info');
+                }
+                networkDiff += (Math.random() - 0.5) * 0.05;
+                document.getElementById('tickerDiff').innerText = networkDiff.toFixed(2) + 'T';
+                networkHashrate += (Math.random() - 0.5) * 0.4;
+                document.getElementById('tickerNet').innerText = networkHashrate.toFixed(1) + ' EH/s';
+                document.getElementById('globalHash').innerText = networkHashrate.toFixed(1) + ' EH/s';
+            }, 2000);
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        function navigate(pageId, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + pageId).classList.add('active');
+            if (btn) btn.classList.add('active');
+            haptic('light');
+            if (pageId === 'ranks') updateRank();
+            if (pageId === 'workers') renderWorkers();
+        }
+
+        // ============================================================
+        // HAPTIC
+        // ============================================================
+        function haptic(type) {
+            try {
+                if (type === 'light') tg.HapticFeedback?.impactOccurred('light');
+                else if (type === 'medium') tg.HapticFeedback?.impactOccurred('medium');
+                else if (type === 'heavy') tg.HapticFeedback?.impactOccurred('heavy');
+                else if (type === 'success') tg.HapticFeedback?.notificationOccurred('success');
+                else if (type === 'warning') tg.HapticFeedback?.notificationOccurred('warning');
+                else if (type === 'error') tg.HapticFeedback?.notificationOccurred('error');
+                else tg.HapticFeedback?.selectionChanged?.();
+            } catch(e) {}
+        }
+
+        // ============================================================
+        // AUDIO
+        // ============================================================
+        function initAudio() {
+            if (audioCtx) return;
+            try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+        }
+
+        function startFanSound() {
+            initAudio();
+            if (!audioCtx || fanOscillator) return;
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                fanOscillator = audioCtx.createOscillator();
+                fanOscillator.type = 'sawtooth';
+                fanOscillator.frequency.value = firmwareMode === 'insane' ? 82 : 62;
+                const o2 = audioCtx.createOscillator();
+                o2.type = 'sine';
+                o2.frequency.value = firmwareMode === 'insane' ? 164 : 124;
+                fanGain = audioCtx.createGain();
+                fanGain.gain.value = 0;
+                fanGain.gain.linearRampToValueAtTime(firmwareMode === 'insane' ? 0.05 : 0.035, audioCtx.currentTime + 1.5);
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = firmwareMode === 'insane' ? 600 : 400;
+                filter.Q.value = 1.2;
+                fanOscillator.connect(filter);
+                o2.connect(filter);
+                filter.connect(fanGain);
+                fanGain.connect(audioCtx.destination);
+                fanOscillator.start();
+                o2.start();
+                fanOscillator._osc2 = o2;
+            } catch(e) {}
+        }
+
+        function stopFanSound() {
+            if (!audioCtx || !fanOscillator) return;
+            try {
+                if (fanGain) fanGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.8);
+                const o1 = fanOscillator, o2 = fanOscillator._osc2;
+                setTimeout(() => {
+                    try { o1.stop(); } catch(e) {}
+                    try { o2?.stop(); } catch(e) {}
+                }, 900);
+                fanOscillator = null;
+                fanGain = null;
+            } catch(e) {}
+        }
+
+        // ============================================================
+        // FIRMWARE MODE
+        // ============================================================
+        function setFirmware(mode) {
+            if (firmwareMode === mode) return;
+            firmwareMode = mode;
+            haptic('medium');
+            ['eco', 'balanced', 'insane'].forEach(m => {
+                document.getElementById('fw-' + m).classList.toggle('active', m === mode);
+            });
+            const cfg = FIRMWARE_CONFIG[mode];
+            document.getElementById('firmwareBadge').innerText = cfg.label;
+            document.getElementById('firmwareBadge').className = mode === 'insane' ? 'badge-red' : (mode === 'eco' ? 'badge-slate' : 'badge-green');
+            
+            const descMap = {
+                eco: 'Eco mode: Reduced hashrate for lower power draw & minimal thermal footprint.',
+                balanced: 'Balanced mode: Stable performance with optimal thermal envelope.',
+                insane: 'Insane Overclock: +35% hashrate. WARNING: High thermal output — risk of throttling above 82°C.'
+            };
+            document.getElementById('firmwareDesc').innerText = descMap[mode];
+            addTerminalLog(`Firmware mode changed → ${cfg.label}`, mode === 'insane' ? 'warn' : '');
+            pushNotification('Firmware Updated', `ASIC firmware switched to ${cfg.label}. Hashrate multiplier: ${cfg.hashrateMult}x, Power: ${cfg.powerMult}x.`, mode === 'insane' ? 'warn' : 'info');
+        }
+
+        // ============================================================
+        // POOL ROUTING SLIDERS
+        // ============================================================
+        function onPoolSlider(changed) {
+            const us = parseInt(document.getElementById('sliderUs').value);
+            const eu = parseInt(document.getElementById('sliderEu').value);
+            const asia = parseInt(document.getElementById('sliderAsia').value);
+            // Normalize to sum 100
+            const total = us + eu + asia || 1;
+            const norm = (v) => Math.round((v / total) * 100);
+            let nUs = norm(us), nEu = norm(eu), nAsia = norm(asia);
+            // Fix rounding to sum 100
+            let diff = 100 - (nUs + nEu + nAsia);
+            if (diff !== 0) {
+                if (changed === 'us') nEu += diff;
+                else if (changed === 'eu') nAsia += diff;
+                else nUs += diff;
+            }
+            poolUs = nUs; poolEu = nEu; poolAsia = nAsia;
+            updatePoolUI();
+            haptic('light');
+        }
+
+        function updatePoolUI() {
+            document.getElementById('sliderUsVal').innerText = poolUs + '%';
+            document.getElementById('sliderEuVal').innerText = poolEu + '%';
+            document.getElementById('sliderAsiaVal').innerText = poolAsia + '%';
+            document.getElementById('distUs').style.width = poolUs + '%';
+            document.getElementById('distEu').style.width = poolEu + '%';
+            document.getElementById('distAsia').style.width = poolAsia + '%';
+            document.getElementById('legendUs').innerText = poolUs + '%';
+            document.getElementById('legendEu').innerText = poolEu + '%';
+            document.getElementById('legendAsia').innerText = poolAsia + '%';
+            document.getElementById('poolTotal').innerText = '100%';
+            document.getElementById('sliderUs').style.setProperty('--val', poolUs + '%');
+            document.getElementById('sliderEu').style.setProperty('--val', poolEu + '%');
+            document.getElementById('sliderAsia').style.setProperty('--val', poolAsia + '%');
+        }
+
+        // ============================================================
+        // MINING TOGGLE
+        // ============================================================
+        function toggleMining() {
+            const btn = document.getElementById('toggleBtn');
+            const badge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+            const heroCard = document.getElementById('heroCard');
+
+            if (!active) {
+                active = true;
+                haptic('medium');
+                btn.innerText = 'Stop Allocation';
+                btn.classList.add('running');
+                badge.classList.add('active');
+                statusText.innerText = 'Node Active';
+                heroCard.classList.add('mining-active');
+                document.getElementById('hashSub').innerText = 'Mining...';
+                document.getElementById('tempSub').innerText = 'Active';
+                document.getElementById('fanIcon').classList.add('spinning');
+                document.getElementById('fanBadge').innerText = 'ACTIVE';
+                document.getElementById('fanBadge').className = 'badge-green';
+                document.getElementById('fanStatusText').innerText = 'Cooling Fan: Active';
+                miningStartTime = Date.now();
+
+                startFanSound();
+                addTerminalLog('Allocation command accepted — mining initiated', '');
+                addTerminalLog('Stratum v2 session established', 'info');
+                pushNotification('Mining Started', 'Node allocation is now active. Stratum v2 session established with all routed pools.', 'info');
+
+                loop = setInterval(() => {
+                    const cfg = FIRMWARE_CONFIG[firmwareMode];
+                    const baseRate = 0.00000028;
+                    const hashFactor = cfg.hashrateMult;
+                    btc += (baseRate * hashFactor) + (Math.random() * 0.00000008);
+                    
+                    document.getElementById('btcVal').innerText = btc.toFixed(8);
+                    document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+                    const hash = (142.5 * hashFactor) + Math.random() * 8.5;
+                    document.getElementById('hashVal').innerText = hash.toFixed(1) + " TH/s";
+                    document.getElementById('rankBtc').innerText = btc.toFixed(8) + ' BTC';
+                }, 600);
+
+                telemetryInterval = setInterval(() => {
+                    if (!active) return;
+                    const cfg = FIRMWARE_CONFIG[firmwareMode];
+                    const power = (3400 + Math.random() * 220) * cfg.powerMult;
+                    const fanRpm = (3200 + Math.random() * 400) * (firmwareMode === 'insane' ? 1.2 : 1);
+                    const ping = Math.floor(9 + Math.random() * 18);
+                    let temp = cfg.tempBase + Math.random() * 4;
+                    if (firmwareMode === 'insane' && temp > 82) {
+                        // Thermal throttling
+                        temp = 82;
+                        addTerminalLog('THERMAL THROTTLE — temp exceeded 82°C, hashrate reduced', 'warn');
+                    }
+                    document.getElementById('powerVal').innerText = Math.round(power) + ' W';
+                    document.getElementById('powerBar').style.width = Math.min(100, (power / 6000) * 100) + '%';
+                    document.getElementById('fanVal').innerText = Math.round(fanRpm) + ' RPM';
+                    document.getElementById('fanBar').style.width = Math.min(100, (fanRpm / 4800) * 100) + '%';
+                    document.getElementById('pingVal').innerText = ping + ' ms';
+                    document.getElementById('nodeVal').innerText = NODES[Math.floor(Math.random() * NODES.length)];
+                    document.getElementById('fanDetail').innerText = Math.round(fanRpm) + ' RPM • ' + (fanRpm * 0.014).toFixed(1) + ' CFM';
+                    document.getElementById('tempVal').innerText = temp.toFixed(1) + "°C";
+                    const tempEl = document.getElementById('tempVal');
+                    if (temp > 78) tempEl.style.color = 'var(--accent-red)';
+                    else if (temp > 68) tempEl.style.color = 'var(--accent-amber)';
+                    else tempEl.style.color = 'var(--text-primary)';
+                }, 1200);
+
+                termInterval = setInterval(() => {
+                    if (active) {
+                        const m = LOG_MESSAGES[Math.floor(Math.random() * LOG_MESSAGES.length)];
+                        addTerminalLog(m.msg, m.type);
+                    }
+                }, 1800 + Math.random() * 1600);
+
+            } else {
+                active = false;
+                haptic('light');
+                btn.innerText = 'Start Allocation';
+                btn.classList.remove('running');
+                badge.classList.remove('active');
+                statusText.innerText = 'Node Idle';
+                heroCard.classList.remove('mining-active');
+                document.getElementById('hashSub').innerText = '—';
+                document.getElementById('tempSub').innerText = 'Idle';
+                document.getElementById('fanIcon').classList.remove('spinning');
+                document.getElementById('fanBadge').innerText = 'IDLE';
+                document.getElementById('fanBadge').className = 'badge-slate';
+                document.getElementById('fanStatusText').innerText = 'Cooling Fan: Idle';
+                document.getElementById('fanDetail').innerText = '0 RPM • 0.0 CFM';
+                document.getElementById('powerVal').innerText = '0 W';
+                document.getElementById('powerBar').style.width = '0%';
+                document.getElementById('fanVal').innerText = '0 RPM';
+                document.getElementById('fanBar').style.width = '0%';
+                document.getElementById('pingVal').innerText = '-- ms';
+                document.getElementById('tempVal').style.color = 'var(--text-primary)';
+
+                stopFanSound();
+                clearInterval(loop); clearInterval(termInterval); clearInterval(telemetryInterval);
+                document.getElementById('hashVal').innerText = "0.0 TH/s";
+                document.getElementById('tempVal').innerText = "32°C";
+                addTerminalLog('Mining allocation stopped — node idle', 'warn');
+                pushNotification('Mining Stopped', 'Node allocation has been halted. All workers idled.', 'warn');
+            }
+        }
+
+        // ============================================================
+        // TERMINAL
+        // ============================================================
+        function addTerminalLog(msg, type) {
+            const term = document.getElementById('terminal');
+            if (!term) return;
+            const now = new Date();
+            const time = now.toTimeString().split(' ')[0];
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.innerHTML = `<span class="term-time">[${time}]</span><span class="term-msg ${type}">${msg}</span>`;
             term.appendChild(line);
             term.scrollTop = term.scrollHeight;
+            while (term.children.length > 40) term.removeChild(term.firstChild);
         }
 
-        function showPopup(title, text) {
+        // ============================================================
+        // LIVE PROFITABILITY LEDGER
+        // ============================================================
+        function startLedger() {
+            ledgerInterval = setInterval(() => {
+                if (!active) {
+                    grossYieldBTC = 0; powerCostBTC = 0; poolFeeBTC = 0; netProfitBTC = 0;
+                    updateLedgerUI();
+                    return;
+                }
+                const cfg = FIRMWARE_CONFIG[firmwareMode];
+                const hashTH = 234.2 * cfg.hashrateMult;
+                const powerW = 3510 * cfg.powerMult;
+                
+                // Gross BTC yield per hour (simulated)
+                grossYieldBTC = (hashTH / 1e6) * 6.25 * 0.00000001 * 3600;
+                // Power cost: (W/1000) * rate ($/kWh) → USD → BTC
+                const powerCostUSD = (powerW / 1000) * ELECTRICITY_RATE;
+                powerCostBTC = powerCostUSD / btcPrice;
+                // Pool fee 1%
+                poolFeeBTC = grossYieldBTC * POOL_FEE_PCT;
+                netProfitBTC = grossYieldBTC - powerCostBTC - poolFeeBTC;
+                updateLedgerUI();
+            }, 1500);
+        }
+
+        function updateLedgerUI() {
+            const gross = grossYieldBTC;
+            const power = powerCostBTC;
+            const fee = poolFeeBTC;
+            const net = netProfitBTC;
+            const total = gross + power + fee || 1;
+
+            document.getElementById('segGross').style.width = (gross / total * 100) + '%';
+            document.getElementById('segPower').style.width = (power / total * 100) + '%';
+            document.getElementById('segFee').style.width = (fee / total * 100) + '%';
+
+            document.getElementById('ledgerGross').innerText = '+' + gross.toFixed(10) + ' BTC/hr';
+            document.getElementById('ledgerPower').innerText = '-' + power.toFixed(10) + ' BTC/hr';
+            document.getElementById('ledgerFee').innerText = '-' + fee.toFixed(10) + ' BTC/hr';
+            const netEl = document.getElementById('ledgerNet');
+            netEl.innerText = (net >= 0 ? '+' : '') + net.toFixed(10) + ' BTC/hr';
+            netEl.className = 'ledger-value ' + (net >= 0 ? 'pos' : 'neg');
+        }
+
+        // ============================================================
+        // WORKERS
+        // ============================================================
+        function renderWorkers() {
+            const list = document.getElementById('workerList');
+            if (!list) return;
+            list.innerHTML = '';
+            workers.forEach((w, idx) => {
+                const el = document.createElement('div');
+                el.className = 'worker-item' + (w.online ? '' : ' offline');
+                el.innerHTML = `
+                    <div class="worker-header">
+                        <div class="worker-name">
+                            <span class="worker-dot"></span>
+                            ${w.name}
+                        </div>
+                        <div class="toggle-switch ${w.online ? 'on' : ''}" onclick="toggleWorker(${idx})"></div>
+                    </div>
+                    <div class="worker-metrics">
+                        <div>
+                            <div class="worker-metric-label">HASHRATE</div>
+                            <div class="worker-metric-value" id="wh-${idx}">${w.online ? w.hashrate.toFixed(1) + ' TH/s' : '0.0 TH/s'}</div>
+                        </div>
+                        <div>
+                            <div class="worker-metric-label">TEMP</div>
+                            <div class="worker-metric-value" id="wt-${idx}">${w.online ? w.temp.toFixed(0) + '°C' : '—'}</div>
+                        </div>
+                        <div>
+                            <div class="worker-metric-label">PING</div>
+                            <div class="worker-metric-value" id="wp-${idx}">${w.online ? w.ping + ' ms' : '—'}</div>
+                        </div>
+                        <div>
+                            <div class="worker-metric-label">NODE</div>
+                            <div class="worker-metric-value" id="wn-${idx}" style="font-size:9px;">${w.node}</div>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(el);
+            });
+            const online = workers.filter(w => w.online).length;
+            document.getElementById('workerOnlineCount').innerText = online + ' online';
+        }
+
+        function toggleWorker(idx) {
+            haptic('medium');
+            workers[idx].online = !workers[idx].online;
+            if (workers[idx].online) {
+                workers[idx].hashrate = 233 + Math.random() * 3;
+                workers[idx].temp = 62 + Math.random() * 4;
+                workers[idx].ping = Math.floor(9 + Math.random() * 20);
+                workers[idx].node = NODES[Math.floor(Math.random() * NODES.length)];
+                addTerminalLog(`Worker ${workers[idx].name} brought online`, 'info');
+                pushNotification('Worker Online', `${workers[idx].name} is now online and accepting shares.`, 'info');
+            } else {
+                addTerminalLog(`Worker ${workers[idx].name} taken offline`, 'warn');
+                pushNotification('Worker Offline', `${workers[idx].name} has been shut down by operator.`, 'warn');
+            }
+            renderWorkers();
+        }
+
+        function startWorkerTelemetry() {
+            workerInterval = setInterval(() => {
+                workers.forEach((w, idx) => {
+                    if (w.online && active) {
+                        w.hashrate = 233 + Math.random() * 3;
+                        w.temp = 62 + Math.random() * 5;
+                        w.ping = Math.floor(9 + Math.random() * 20);
+                        const hEl = document.getElementById('wh-' + idx);
+                        const tEl = document.getElementById('wt-' + idx);
+                        const pEl = document.getElementById('wp-' + idx);
+                        if (hEl) hEl.innerText = w.hashrate.toFixed(1) + ' TH/s';
+                        if (tEl) tEl.innerText = w.temp.toFixed(0) + '°C';
+                        if (pEl) pEl.innerText = w.ping + ' ms';
+                    }
+                });
+            }, 2000);
+        }
+
+        // ============================================================
+        // NOTIFICATIONS
+        // ============================================================
+        function pushNotification(title, body, type) {
+            const notif = {
+                id: Date.now(),
+                title, body, type,
+                time: 'just now',
+                unread: true
+            };
+            notifications.unshift(notif);
+            if (notifications.length > 30) notifications.pop();
+            updateNotifBadge();
+            renderNotifs();
+            showToast(title, body, type);
+        }
+
+        function updateNotifBadge() {
+            const unread = notifications.filter(n => n.unread).length;
+            const badge = document.getElementById('notifBadge');
+            if (unread > 0) {
+                badge.style.display = 'flex';
+                badge.innerText = unread > 9 ? '9+' : unread;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function renderNotifs() {
+            const list = document.getElementById('notifList');
+            if (!list) return;
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="notif-empty">No notifications yet</div>';
+                return;
+            }
+            list.innerHTML = '';
+            notifications.forEach(n => {
+                const el = document.createElement('div');
+                el.className = `notif-item ${n.unread ? 'unread' : ''} ${n.type}`;
+                el.innerHTML = `
+                    <div class="notif-item-header">
+                        <div class="notif-item-title">${n.title}</div>
+                        <div class="notif-item-time">${n.time}</div>
+                    </div>
+                    <div class="notif-item-body">${n.body}</div>
+                `;
+                list.appendChild(el);
+            });
+        }
+
+        function openNotifDrawer() {
+            haptic('light');
+            document.getElementById('notifDrawer').classList.add('open');
+            // Mark all as read
+            setTimeout(() => {
+                notifications.forEach(n => n.unread = false);
+                updateNotifBadge();
+                renderNotifs();
+            }, 800);
+            renderNotifs();
+        }
+
+        function closeNotifDrawer() {
+            haptic('light');
+            document.getElementById('notifDrawer').classList.remove('open');
+        }
+
+        // Toast
+        function showToast(title, body, type) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            const iconMap = {
+                info: { cls: 'blue', svg: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>' },
+                warn: { cls: 'amber', svg: '<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>' },
+                error: { cls: 'red', svg: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>' }
+            };
+            const icon = iconMap[type] || iconMap.info;
+            toast.innerHTML = `
+                <div class="toast-icon ${icon.cls}">${icon.svg}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-body">${body}</div>
+                </div>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('out');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Simulation of incoming notifications
+        function startNotifSimulation() {
+            const incomingNotifs = [
+                { title: 'High Thermal Spike', body: 'High thermal spike detected on Node #3. Cooling fan ramped to 3900 RPM.', type: 'warn' },
+                { title: 'Payout Round Initiated', body: 'Payout round #8420 initiated. Expected completion ~24 min.', type: 'info' },
+                { title: 'Worker Auto-Scaled', body: 'Worker_S21_02 auto-scaled hashrate by +2.4 TH/s based on pool demand.', type: 'info' },
+                { title: 'New Share Accepted', body: 'Share accepted by EU-Central pool. Difficulty 12.8T.', type: 'info' },
+                { title: 'Ping Anomaly Detected', body: 'Latency spike detected on Asia-Quantum route: 42ms → 68ms.', type: 'warn' },
+                { title: 'Block Found', body: 'New block template received. Transaction count: 2,847.', type: 'info' }
+            ];
+            notifInterval = setInterval(() => {
+                if (active && Math.random() < 0.35) {
+                    const n = incomingNotifs[Math.floor(Math.random() * incomingNotifs.length)];
+                    pushNotification(n.title, n.body, n.type);
+                }
+            }, 18000);
+        }
+
+        // ============================================================
+        // WALLET CONNECT
+        // ============================================================
+        function openWalletModal() {
+            haptic('medium');
+            if (walletConnected) {
+                showModal('Wallet Connected', 'Web3 Security Enclave active. Tier-1 KYC verified. Node cluster fully operational.', 'check');
+                return;
+            }
+            const walletModalHTML = `
+                <div class="wallet-list">
+                    <div class="wallet-option" onclick="selectWallet('MetaMask')">
+                        <div class="wallet-logo mm">🦊</div>
+                        <div style="flex:1;">
+                            <div class="wallet-name">MetaMask</div>
+                            <div class="wallet-desc">Connect to your MetaMask Wallet</div>
+                        </div>
+                    </div>
+                    <div class="wallet-option" onclick="selectWallet('Phantom')">
+                        <div class="wallet-logo ph">👻</div>
+                        <div style="flex:1;">
+                            <div class="wallet-name">Phantom</div>
+                            <div class="wallet-desc">Connect to your Phantom Wallet</div>
+                        </div>
+                    </div>
+                    <div class="wallet-option" onclick="selectWallet('Coinbase')">
+                        <div class="wallet-logo cb">🔵</div>
+                        <div style="flex:1;">
+                            <div class="wallet-name">Coinbase Wallet</div>
+                            <div class="wallet-desc">Connect to your Coinbase Wallet</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-warn">
+                    <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    <span>This is a simulated environment. No real wallet connection or KYC verification is performed.</span>
+                </div>
+            `;
+            showModal('Connect Wallet', 'Choose your preferred Web3 provider to connect to the VALENCE Protocol.', 'shield', walletModalHTML);
+        }
+
+        function selectWallet(name) {
+            haptic('medium');
+            document.getElementById('mTitle').innerText = 'Connecting...';
+            document.getElementById('mDesc').innerHTML = `Establishing secure connection to <strong style="color:#fff">${name}</strong>...<br><br><span style="color:var(--accent-green); font-family:var(--font-mono); font-size:11px;">Requesting account access…</span>`;
+            document.getElementById('modalExtra').innerHTML = '';
+
+            setTimeout(() => {
+                const hex = '0123456789abcdef';
+                let addr = '0x';
+                for (let i = 0; i < 4; i++) addr += hex[Math.floor(Math.random() * 16)];
+                addr += '...';
+                for (let i = 0; i < 4; i++) addr += hex[Math.floor(Math.random() * 16)];
+
+                const receipt = `
+                    <div class="receipt">
+                        <div style="color:var(--accent-green); margin-bottom:6px; font-weight:700;">◆ GAS AUTHORIZATION RECEIPT</div>
+                        <div class="line"><span>Network</span><span class="val">Ethereum Mainnet</span></div>
+                        <div class="line"><span>Gas Limit</span><span class="val">21,000</span></div>
+                        <div class="line"><span>Gas Price</span><span class="val">12.4 Gwei</span></div>
+                        <div class="line"><span>Est. Fee</span><span class="val green">0.00026 ETH</span></div>
+                        <div class="line"><span>Nonce</span><span class="val">${Math.floor(Math.random() * 900 + 100)}</span></div>
+                        <div class="line"><span>Status</span><span class="val green">✓ Authorized</span></div>
+                    </div>
+                `;
+
+                walletConnected = true;
+                document.getElementById('walletLabel').innerText = addr;
+                document.getElementById('walletDot').classList.add('connected');
+                addTerminalLog(`Wallet ${addr} connected via ${name}`, 'info');
+                addTerminalLog('Gas authorization signed — node access granted', '');
+                pushNotification('Wallet Connected', `${name} wallet connected: ${addr}`, 'info');
+                showModal('Wallet Connected', `Successfully connected to <strong style="color:#fff">${name}</strong>.<br><br>Address: <strong style="color:var(--accent-green); font-family:var(--font-mono); font-size:11px;">${addr}</strong>`, 'check', receipt);
+                haptic('success');
+            }, 1400);
+        }
+
+        // ============================================================
+        // WITHDRAW AML GATEWAY
+        // ============================================================
+        function withdrawFunds() {
+            haptic('warning');
+            const hex = '0123456789abcdef';
+            let depositAddr = 'bc1q';
+            for (let i = 0; i < 38; i++) depositAddr += hex[Math.floor(Math.random() * 16)];
+            const qrSVG = generateQRPattern();
+
+            const html = `
+                <div class="countdown-display" id="amlCountdown">14:59</div>
+                <div class="gateway-box">
+                    <div class="gateway-row"><span class="gateway-label">AML Status</span><span class="gateway-value amber">⧗ Pending</span></div>
+                    <div class="gateway-row"><span class="gateway-label">KYC Tier</span><span class="gateway-value">Tier-1 (Basic)</span></div>
+                    <div class="gateway-row"><span class="gateway-label">Required Gas Fee</span><span class="gateway-value green">0.00042 BTC</span></div>
+                    <div class="gateway-row"><span class="gateway-label">Network</span><span class="gateway-value">Bitcoin Mainnet</span></div>
+                    <div class="gateway-row"><span class="gateway-label">Confirmations</span><span class="gateway-value red">0 / 3</span></div>
+                </div>
+                <div class="qr-placeholder">${qrSVG}</div>
+                <div class="deposit-address" onclick="copyDeposit('${depositAddr}')" style="cursor:pointer;">
+                    ${depositAddr}
+                    <div style="margin-top:4px; color:var(--accent-green); font-size:9px;">Tap to copy</div>
+                </div>
+                <div class="modal-warn">
+                    <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    <span>Send exactly <strong>0.00042 BTC</strong> to the address above within the time limit. Insufficient payment will result in automatic cancellation.</span>
+                </div>
+                <button class="secondary-btn" style="margin-bottom:8px;" onclick="verifyWithdrawal()">I've Sent the Gas Fee</button>
+            `;
+            showModal('AML & Gas Fee Verification', 'Anti-Money Laundering (AML) verification and network gas fee authorization required to finalize withdrawal.', 'lock', html);
+            startCountdown(14 * 60 + 59);
+        }
+
+        function generateQRPattern() {
+            let rects = '';
+            const size = 21;
+            for (let y = 0; y < size; y++) {
+                for (let x = 0; x < size; x++) {
+                    const isMarker = (x < 7 && y < 7) || (x > size - 8 && y < 7) || (x < 7 && y > size - 8);
+                    const markerInner = isMarker && ((x > 0 && x < 6 && y > 0 && y < 6) || (x > size - 7 && x < size - 1 && y > 0 && y < 6) || (x > 0 && x < 6 && y > size - 7 && y < size - 1));
+                    const markerCenter = isMarker && (x > 1 && x < 5 && y > 1 && y < 5) || (isMarker && x > size - 6 && x < size - 2 && y > 1 && y < 5) || (isMarker && x > 1 && x < 5 && y > size - 6 && y < size - 2);
+                    let fill = false;
+                    if (markerCenter) fill = true;
+                    else if (isMarker && !markerInner) fill = true;
+                    else if (!isMarker && Math.random() < 0.45) fill = true;
+                    if (fill) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="#000"/>`;
+                }
+            }
+            return `<svg viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">${rects}</svg>`;
+        }
+
+        function startCountdown(seconds) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            let remaining = seconds;
+            const el = document.getElementById('amlCountdown');
+            if (!el) return;
+            countdownInterval = setInterval(() => {
+                remaining--;
+                if (remaining < 0) { clearInterval(countdownInterval); if (el) el.innerText = '00:00'; return; }
+                const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+                const s = (remaining % 60).toString().padStart(2, '0');
+                if (el) { el.innerText = `${m}:${s}`; if (remaining < 60) el.style.color = 'var(--accent-red)'; }
+            }, 1000);
+        }
+
+        function copyDeposit(addr) {
+            haptic('success');
+            try { navigator.clipboard.writeText(addr); } catch(e) {}
+            addTerminalLog('Deposit address copied to clipboard', 'info');
+        }
+
+        function verifyWithdrawal() {
+            haptic('warning');
+            if (countdownInterval) clearInterval(countdownInterval);
+            showModal('Verification Pending', 'Blockchain verification in progress. Your transaction is being confirmed by the network. Please allow 10-30 minutes for 3 confirmations.', 'check', `
+                <div class="receipt">
+                    <div class="line"><span>TX Status</span><span class="val amber">⧗ Broadcasting</span></div>
+                    <div class="line"><span>Mempool</span><span class="val">14,822 txns</span></div>
+                    <div class="line"><span>Est. Confirmation</span><span class="val">~18 min</span></div>
+                    <div class="line"><span>AML Review</span><span class="val amber">In Progress</span></div>
+                </div>
+            `);
+            addTerminalLog('Withdrawal verification submitted — awaiting AML review', 'warn');
+        }
+
+        // ============================================================
+        // COPY REFERRAL / AIRDROP
+        // ============================================================
+        function copyRef() {
+            const input = document.getElementById('refLink');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            try {
+                navigator.clipboard.writeText(input.value);
+                haptic('success');
+                const btn = document.getElementById('copyBtn');
+                btn.innerText = 'Copied!';
+                setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
+            } catch(e) { try { document.execCommand('copy'); haptic('success'); } catch(e2) {} }
+        }
+
+        function claimAirdrop() {
+            if (airdropClaimed) {
+                haptic('warning');
+                showModal('Already Claimed', 'Daily airdrop has already been claimed. Next claim available in 23h 59m.', 'warn');
+                return;
+            }
+            btc += 0.00005000;
+            airdropClaimed = true;
+            haptic('success');
+            document.getElementById('btcVal').innerText = btc.toFixed(8);
+            document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+            document.getElementById('rankBtc').innerText = btc.toFixed(8) + ' BTC';
+            const btn = document.getElementById('airdropBtn');
+            btn.innerText = 'Claimed ✓';
+            btn.style.background = 'var(--surface-2)';
+            btn.style.color = 'var(--text-muted)';
+            btn.style.borderColor = 'var(--border)';
+            btn.onclick = () => { haptic('warning'); showModal('Already Claimed', 'Daily airdrop already claimed.', 'warn'); };
+            addTerminalLog('Airdrop +0.00005000 BTC credited', '');
+            pushNotification('Airdrop Claimed', '+0.00005000 BTC credited to unconfirmed balance.', 'info');
+            showModal('Airdrop Claimed', '+0.00005000 BTC has been credited to your unconfirmed balance.', 'check');
+        }
+
+        // ============================================================
+        // RANK UPDATE
+        // ============================================================
+        function updateRank() {
+            document.getElementById('rankBtc').innerText = btc.toFixed(8) + ' BTC';
+            const up = document.getElementById('rankUp');
+            if (btc > 0.00001) up.innerText = '▲ +2 positions';
+            else if (btc > 0) up.innerText = '▲ +1 position';
+            else up.innerText = '';
+        }
+
+        // ============================================================
+        // MODAL SYSTEM
+        // ============================================================
+        function showModal(title, desc, iconType, extraHTML) {
             document.getElementById('mTitle').innerText = title;
-            document.getElementById('mText').innerText = text;
+            document.getElementById('mDesc').innerHTML = desc;
             document.getElementById('modal').style.display = 'flex';
+            const iconEl = document.getElementById('modalIconSvg');
+            const extraEl = document.getElementById('modalExtra');
+            const modalIcon = document.getElementById('modalIcon');
+
+            if (iconType === 'check') {
+                iconEl.innerHTML = '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>';
+                modalIcon.style.background = 'var(--accent-green-bg)';
+                modalIcon.style.borderColor = 'rgba(16,185,129,0.25)';
+                iconEl.style.fill = 'var(--accent-green)';
+            } else if (iconType === 'warn') {
+                iconEl.innerHTML = '<path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>';
+                modalIcon.style.background = 'rgba(245,158,11,0.1)';
+                modalIcon.style.borderColor = 'rgba(245,158,11,0.25)';
+                iconEl.style.fill = 'var(--accent-amber)';
+            } else if (iconType === 'lock') {
+                iconEl.innerHTML = '<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>';
+                modalIcon.style.background = 'var(--surface-2)';
+                modalIcon.style.borderColor = 'var(--border)';
+                iconEl.style.fill = 'var(--text-secondary)';
+            } else if (iconType === 'shield') {
+                iconEl.innerHTML = '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>';
+                modalIcon.style.background = 'rgba(96,165,250,0.1)';
+                modalIcon.style.borderColor = 'rgba(96,165,250,0.25)';
+                iconEl.style.fill = 'var(--accent-blue)';
+            }
+            extraEl.innerHTML = extraHTML || '';
         }
 
-        function closePopup() {
+        function closeModal() {
             document.getElementById('modal').style.display = 'none';
+            haptic('light');
+            if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
         }
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ============================================================
+        // UPTIME
+        // ============================================================
+        function startUptime() {
+            uptimeInterval = setInterval(() => {
+                uptimeSeconds++;
+                const h = Math.floor(uptimeSeconds / 3600).toString().padStart(2, '0');
+                const m = Math.floor((uptimeSeconds % 3600) / 60).toString().padStart(2, '0');
+                const s = (uptimeSeconds % 60).toString().padStart(2, '0');
+                document.getElementById('uptimeVal').innerText = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+
+        // ============================================================
+        // BOOT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btcVal').innerText = btc.toFixed(8);
+            document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+            document.getElementById('rankBtc').innerText = btc.toFixed(8) + ' BTC';
+
+            startMarketFeed();
+            startBlockSimulation();
+            startUptime();
+            startLedger();
+            startWorkerTelemetry();
+            startNotifSimulation();
+
+            updatePoolUI();
+            renderWorkers();
+            renderNotifs();
+            updateNotifBadge();
+
+            document.getElementById('tickerBlock').innerText = '#' + blockHeight.toLocaleString();
+            document.getElementById('tickerDiff').innerText = networkDiff.toFixed(2) + 'T';
+            document.getElementById('tickerNet').innerText = networkHashrate.toFixed(1) + ' EH/s';
+
+            rankInterval = setInterval(() => {
+                if (document.getElementById('page-ranks').classList.contains('active')) updateRank();
+            }, 2000);
+
+            document.body.addEventListener('touchstart', () => {
+                initAudio();
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }, { once: true });
+            document.body.addEventListener('click', () => {
+                initAudio();
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            }, { once: true });
+        });
     </script>
 </body>
 </html>
