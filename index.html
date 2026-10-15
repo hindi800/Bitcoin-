@@ -120,6 +120,40 @@
             font-family: var(--font-mono);
         }
 
+        /* ============ USER PROFILE BUTTON ============ */
+        .user-profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px 4px 4px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+        }
+        .user-profile-btn:active { transform: scale(0.96); background: var(--surface-3); border-color: var(--border-hover); }
+
+        .user-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
         .wallet-btn {
             background: var(--surface-2);
             border: 1px solid var(--border);
@@ -174,6 +208,8 @@
 
         .market-ticker::-webkit-scrollbar { display: none; }
         .ticker-item { display: flex; align-items: center; gap: 6px; }
+        .ticker-item.clickable { cursor: pointer; }
+        .ticker-item.clickable:active { opacity: 0.7; }
         .ticker-label { color: var(--text-muted); font-weight: 600; }
         .ticker-value { color: var(--text-primary); font-weight: 600; }
         .ticker-value.up { color: var(--accent-green); }
@@ -362,6 +398,9 @@
         .balance-value .digit.roll-down {
             animation: rollDown 0.3s ease;
         }
+        .balance-value .digit:last-child {
+            animation: subtlePulse 1.5s ease-in-out infinite;
+        }
         @keyframes rollUp {
             0% { transform: translateY(60%); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
@@ -369,6 +408,10 @@
         @keyframes rollDown {
             0% { transform: translateY(-60%); opacity: 0; }
             100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes subtlePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .balance-sub {
@@ -399,6 +442,42 @@
         .change-badge.neg { background: rgba(239,68,68,0.12); color: var(--accent-red); border: 1px solid rgba(239,68,68,0.25); }
         
         .sparkline-svg { width: 60px; height: 18px; }
+
+        /* ============ WALLET PREVIEW ============ */
+        .wallet-preview {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: var(--surface-2);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-xs);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .wallet-preview:active { transform: scale(0.99); border-color: var(--border-hover); }
+        .wallet-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .wallet-preview-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            padding: 2px 0;
+        }
+        .wallet-preview-row .label { color: var(--text-muted); }
+        .wallet-preview-row .value { color: var(--text-primary); font-weight: 600; transition: color 0.3s ease, transform 0.15s ease; }
+        .wallet-preview-row .value.green { color: var(--accent-green); }
+        .wallet-preview-row .value.amber { color: var(--accent-amber); }
+        .wallet-preview-row .value.updating { color: var(--accent-green); transform: scale(1.05); }
 
         /* ============ VIP BADGE ============ */
         .vip-badge {
@@ -464,6 +543,7 @@
         .mining-btn-wrap {
             width: 100%;
             margin-top: 8px;
+            position: relative;
         }
 
         .primary-btn {
@@ -483,6 +563,8 @@
         .primary-btn.running {
             background: #b91c1c; color: #ffffff;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            font-size: 13px;
+            padding: 15px 12px;
         }
 
         .primary-btn:disabled {
@@ -504,6 +586,27 @@
             border-top-color: #fff;
         }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .btn-hint {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 3px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+        @media (hover: hover) {
+            .mining-btn-wrap:hover .btn-hint { opacity: 1; }
+        }
 
         .secondary-btn {
             width: 100%; padding: 12px;
@@ -792,6 +895,34 @@
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
+        /* ============ SHARE LOG TICKER ============ */
+        .share-log {
+            background: #0a0c10;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            line-height: 1.8;
+            max-height: 110px;
+            overflow-y: auto;
+        }
+        .share-log::-webkit-scrollbar { width: 3px; }
+        .share-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .share-log-line {
+            display: flex;
+            gap: 6px;
+            animation: termLine 0.3s ease;
+            white-space: nowrap;
+        }
+        .share-log-line.accepted .status { color: var(--accent-green); }
+        .share-log-line.stale .status { color: var(--accent-amber); }
+        .share-log-line.rejected .status { color: var(--accent-red); }
+        .share-log-time { color: var(--text-muted); flex-shrink: 0; }
+        .share-log-id { color: var(--text-secondary); }
+        .share-log-diff { color: var(--accent-cyan); }
+        .share-log-status { font-weight: 700; }
+
         /* ============ CARDS ============ */
         .card-item {
             background: var(--surface-1);
@@ -1010,6 +1141,138 @@
         .firmware-update-banner .actions .update-btn:active,
         .firmware-update-banner .actions .later-btn:active { transform: scale(0.95); }
 
+        /* ============ MINING POOL SELECTOR ============ */
+        .pool-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        .pool-option:last-child { margin-bottom: 0; }
+        .pool-option:active { transform: scale(0.98); }
+        .pool-option.selected {
+            background: var(--accent-green-bg);
+            border-color: var(--accent-green);
+        }
+        .pool-option-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+        .pool-name {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .pool-meta {
+            font-size: 9.5px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .pool-meta .fee { color: var(--accent-amber); }
+        .pool-meta .uptime { color: var(--accent-green); }
+        .pool-meta .latency { color: var(--accent-cyan); }
+        .pool-check {
+            font-size: 14px;
+            color: var(--accent-green);
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .pool-option.selected .pool-check { opacity: 1; }
+
+        /* ============ HARDWARE SHOP ============ */
+        .rig-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .rig-card:last-child { margin-bottom: 0; }
+        .rig-card.owned {
+            border-color: rgba(16,185,129,0.35);
+            background: linear-gradient(135deg, rgba(16,185,129,0.05) 0%, var(--surface-2) 60%);
+        }
+        .rig-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .rig-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .rig-stats {
+            display: flex;
+            gap: 12px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .rig-stat {
+            display: flex;
+            flex-direction: column;
+        }
+        .rig-stat-label {
+            font-size: 8px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-weight: 600;
+        }
+        .rig-stat-value {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .rig-stat-value.green { color: var(--accent-green); }
+        .rig-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .rig-price {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: var(--font-mono);
+            color: var(--accent-gold);
+        }
+        .rig-btn {
+            padding: 7px 14px;
+            background: var(--accent-green);
+            border: none;
+            border-radius: 6px;
+            color: #000;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .rig-btn:active { transform: scale(0.95); }
+        .rig-btn:disabled {
+            background: var(--surface-3);
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
         /* ============ LEDGER ============ */
         .ledger-row {
             display: flex; justify-content: space-between; align-items: center;
@@ -1155,6 +1418,162 @@
         .pool-luck-dot.amber { background: var(--accent-amber); box-shadow: 0 0 4px rgba(245,158,11,0.5); }
         .pool-luck-dot.red { background: var(--accent-red); box-shadow: 0 0 4px rgba(239,68,68,0.5); }
 
+        /* ============ PAYOUT COUNTDOWN ============ */
+        .payout-countdown-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+        }
+        .payout-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .payout-title {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .payout-timer {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-green);
+            text-align: center;
+            padding: 4px 0;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .payout-progress {
+            height: 6px;
+            background: var(--surface-2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .payout-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), #34d399);
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .payout-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        /* ============ MINING FORECAST ============ */
+        .forecast-card {
+            background: var(--surface-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+        }
+        .forecast-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            border-bottom: 1px dashed rgba(255,255,255,0.05);
+        }
+        .forecast-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .forecast-label { color: var(--text-muted); }
+        .forecast-value { color: var(--text-primary); font-weight: 600; }
+        .forecast-value.green { color: var(--accent-green); }
+        .forecast-value.amber { color: var(--accent-amber); }
+
+        /* ============ CARBON OFFSET ============ */
+        .carbon-card {
+            background: linear-gradient(135deg, rgba(16,185,129,0.06) 0%, var(--surface-1) 60%);
+            border: 1px solid rgba(16,185,129,0.15);
+            border-radius: var(--radius);
+            padding: 14px;
+        }
+        .carbon-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 11px;
+            font-family: var(--font-mono);
+            border-bottom: 1px dashed rgba(255,255,255,0.05);
+        }
+        .carbon-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .carbon-label { color: var(--text-muted); }
+        .carbon-value { color: var(--text-primary); font-weight: 600; }
+        .carbon-value.green { color: var(--accent-green); }
+
+        /* ============ CONTRACT CARD ============ */
+        .contract-card {
+            background: linear-gradient(135deg, rgba(168,85,247,0.06) 0%, var(--surface-1) 60%);
+            border: 1px solid rgba(168,85,247,0.15);
+            border-radius: var(--radius);
+            padding: 14px;
+        }
+        .contract-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 11px;
+            font-family: var(--font-mono);
+        }
+        .contract-label { color: var(--text-muted); }
+        .contract-value { color: var(--text-primary); font-weight: 600; }
+        .contract-value.purple { color: var(--accent-purple); }
+
+        /* ============ COMPOUND REINVEST ============ */
+        .compound-progress-bar {
+            height: 6px;
+            background: var(--surface-2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+            margin-bottom: 6px;
+        }
+        .compound-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .compound-progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        /* ============ NODE MAP ============ */
+        .node-map {
+            position: relative;
+            width: 100%;
+            height: 160px;
+            background: var(--surface-2);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .node-map svg {
+            width: 100%; height: 100%;
+        }
+        .node-dot {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .node-dot.active {
+            filter: drop-shadow(0 0 6px var(--accent-green));
+        }
+
         /* ============ WORKERS ============ */
         .worker-item {
             background: var(--surface-1);
@@ -1224,6 +1643,19 @@
             transform: translateX(14px);
             background: var(--accent-green);
             box-shadow: 0 0 4px rgba(16,185,129,0.4);
+        }
+
+        /* Small toggle variant */
+        .toggle-switch.small {
+            width: 28px;
+            height: 16px;
+        }
+        .toggle-switch.small::after {
+            width: 12px;
+            height: 12px;
+        }
+        .toggle-switch.small.on::after {
+            transform: translateX(12px);
         }
 
         /* ============ NAVBAR ============ */
@@ -1450,7 +1882,7 @@
             bottom: 110px;
             right: 10px;
             left: auto;
-            z-index: 250;
+            z-index: 350;
             pointer-events: none;
             width: auto;
         }
@@ -2008,6 +2440,60 @@
             transition: width 0.6s ease;
         }
 
+        /* ============ SHARE EARNINGS CARD ============ */
+        .share-earnings-card {
+            background: linear-gradient(135deg, rgba(34,211,238,0.06) 0%, var(--surface-1) 60%);
+            border: 1px solid rgba(34,211,238,0.2);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+        .share-earnings-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        .share-earnings-text .highlight {
+            color: var(--accent-green);
+            font-family: var(--font-mono);
+        }
+        .share-earnings-preview {
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 12px;
+            padding: 6px;
+            background: var(--surface-2);
+            border-radius: 6px;
+            word-break: break-all;
+        }
+        .share-btn-row {
+            display: flex;
+            gap: 6px;
+        }
+        .share-btn {
+            flex: 1;
+            padding: 9px 8px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xs);
+            color: var(--text-primary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .share-btn:active { transform: scale(0.95); background: var(--surface-3); border-color: var(--accent-green); }
+        .share-btn.primary { background: var(--accent-green); color: #000; border-color: var(--accent-green); }
+        .share-btn.primary:active { background: #0ea371; }
+
         /* ============ MEMPOOL CONGESTION ============ */
         .congestion-icon {
             display: inline-block;
@@ -2063,9 +2549,63 @@
         }
         .screen-flash.active { opacity: 0.12; }
 
+        /* ============ TOAST CONTAINER (CRITICAL FIX) ============ */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 700; /* ABOVE ALL */
+            display: flex; flex-direction: column; gap: 8px;
+            pointer-events: none;
+            width: 90%; max-width: 360px;
+        }
+
+        .toast {
+            background: rgba(17, 20, 28, 0.95);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            box-shadow: var(--shadow-lg);
+            backdrop-filter: blur(20px);
+            display: flex; gap: 10px; align-items: flex-start;
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .toast.out { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut { to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
+
+        .toast-icon {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .toast-icon.green { background: var(--accent-green-bg); }
+        .toast-icon.green svg { fill: var(--accent-green); }
+        .toast-icon.amber { background: rgba(245,158,11,0.15); }
+        .toast-icon.amber svg { fill: var(--accent-amber); }
+        .toast-icon.red { background: rgba(239,68,68,0.15); }
+        .toast-icon.red svg { fill: var(--accent-red); }
+        .toast-icon.blue { background: rgba(96,165,250,0.15); }
+        .toast-icon.blue svg { fill: var(--accent-blue); }
+
+        .toast-icon svg { width: 13px; height: 13px; }
+
+        .toast-content { flex: 1; min-width: 0; }
+        .toast-title { font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+        .toast-body { font-size: 10px; color: var(--text-secondary); line-height: 1.4; }
+
         /* ============ ACHIEVEMENT UNLOCK ANIMATION ============ */
         .achievement-unlock-overlay {
-            position: fixed; inset: 0; z-index: 300;
+            position: fixed; inset: 0; z-index: 400;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(12px);
             display: flex; align-items: center; justify-content: center;
@@ -2106,6 +2646,51 @@
             font-size: 12px; color: var(--text-secondary);
             margin-bottom: 16px; line-height: 1.5;
         }
+
+        /* ============ PROFILE MODAL STYLES ============ */
+        .profile-header { text-align: center; margin-bottom: 16px; }
+        .profile-avatar-large {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 800; color: #fff; margin: 0 auto 12px;
+            overflow: hidden;
+        }
+        .profile-avatar-large img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+        .profile-username { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
+        .profile-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; margin-bottom: 16px; }
+        .profile-stat { background: var(--surface-2); border-radius: 10px; padding: 10px; text-align: center; }
+        .profile-stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+        .profile-stat-value { font-size: 13px; font-weight: 700; font-family: var(--font-mono); color: var(--text-primary); margin-top: 3px; }
+        .activity-log { max-height: 150px; overflow-y: auto; text-align: left; margin-bottom: 14px; font-family: var(--font-mono); font-size: 10px; }
+        .activity-log-item { padding: 6px 0; border-bottom: 1px dashed rgba(255,255,255,0.05); color: var(--text-secondary); }
+        .activity-log-time { color: var(--text-muted); font-size: 9px; margin-right: 6px; }
+
+        /* ============ NATIVE SELECT STYLING FIX ============ */
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%2394a3b8'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px !important;
+        }
+        select option {
+            background: #181c26;
+            color: #ffffff;
+        }
+
+        /* ============ HEADER RESPONSIVE ============ */
+        @media (max-width: 380px) {
+            .header { padding: 10px 12px; }
+            .brand-sub { display: none; }
+            .brand-title { font-size: 14px; }
+            .wallet-btn #walletLabel { display: none; }
+            .wallet-btn { padding: 8px 10px; }
+            .user-profile-btn span { display: none; }
+            .user-profile-btn { padding: 4px; }
+        }
     </style>
 </head>
 <body>
@@ -2142,17 +2727,22 @@
                 <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
                 <span class="notif-badge" id="notifBadge">3</span>
             </button>
+            <!-- WALLET BUTTON (FIXED) -->
             <button class="wallet-btn" onclick="openWalletModal()" id="walletBtn">
                 <span class="wallet-dot" id="walletDot"></span>
-                <span id="walletLabel">Connect</span>
-                <span class="soon-badge" id="walletSoonBadge">Soon</span>
+                <span id="walletLabel">Wallet</span>
+                <span class="soon-badge">Soon</span>
+            </button>
+            <button class="user-profile-btn" onclick="openProfileModal()" id="userProfileBtn">
+                <div class="user-avatar" id="userAvatar">M</div>
+                <span id="userDisplayName">Miner</span>
             </button>
         </div>
     </header>
 
     <!-- ============ MARKET TICKER ============ -->
     <div class="market-ticker">
-        <div class="ticker-item">
+        <div class="ticker-item clickable" onclick="openPriceChartModal()">
             <span class="live-pip" id="livePip"></span>
             <span class="ticker-label">BTC/USDT</span>
             <span class="ticker-value" id="tickerPrice">$--,---.--</span>
@@ -2166,6 +2756,7 @@
         <div class="ticker-item">
             <span class="ticker-label">Diff</span>
             <span class="ticker-value" id="tickerDiff">--.--T</span>
+            <span class="ticker-value" id="tickerDiffChange">--</span>
         </div>
         <div class="ticker-item">
             <span class="ticker-label">Net</span>
@@ -2217,6 +2808,27 @@
                 </svg>
             </div>
 
+            <!-- Wallet Preview (Coming Soon) -->
+            <div class="wallet-preview" onclick="openWalletModal()">
+                <div class="wallet-preview-header">
+                    <span>Wallet: Not Connected</span>
+                    <span class="soon-badge">Soon</span>
+                </div>
+                <div style="font-size:9px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:6px; text-align:center;">Tap to connect</div>
+                <div class="wallet-preview-row">
+                    <span class="label">Estimated balance</span>
+                    <span class="value" id="walletEstBalance">0.00000000 BTC</span>
+                </div>
+                <div class="wallet-preview-row">
+                    <span class="label">Withdrawable</span>
+                    <span class="value green" id="walletWithdrawable">0.00000000 BTC</span>
+                </div>
+                <div class="wallet-preview-row">
+                    <span class="label">Pending confirmations</span>
+                    <span class="value amber" id="walletPending">0.00000000 BTC</span>
+                </div>
+            </div>
+
             <!-- Thermal Lockout Warning (hidden by default) -->
             <div class="thermal-lockout" id="thermalLockout" style="display:none; margin-top:12px;">
                 <div class="lockout-icon">🌡️</div>
@@ -2233,6 +2845,7 @@
 
         <!-- Mining button BELOW the reactor -->
         <div class="mining-btn-wrap">
+            <span class="btn-hint">Press M to toggle mining</span>
             <button class="primary-btn" id="toggleBtn" onclick="toggleMining()">Start Allocation</button>
         </div>
 
@@ -2240,7 +2853,7 @@
             <div class="metric-card">
                 <div class="metric-label">Hashrate</div>
                 <div class="metric-value" id="hashVal">0.0 TH/s</div>
-                <div class="metric-sub" id="hashSub">—</div>
+                <div class="metric-sub" id="hashStability" style="color:var(--accent-green);">Stability: 99.2%</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Core Temp</div>
@@ -2249,7 +2862,6 @@
             </div>
         </div>
 
-        <!-- Pool Luck + Difficulty + Mempool row -->
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-label">Pool Luck</div>
@@ -2281,7 +2893,6 @@
             </div>
         </div>
 
-        <!-- SHARE ACCEPTANCE + VOLTAGE TELEMETRY -->
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-label">Share Acceptance</div>
@@ -2295,7 +2906,6 @@
             </div>
         </div>
 
-        <!-- DIFFICULTY ADJUSTMENT COUNTDOWN -->
         <div class="diff-adjust-card">
             <div class="diff-adjust-header">
                 <div class="diff-adjust-title">Next Difficulty Adjustment</div>
@@ -2310,7 +2920,6 @@
             </div>
         </div>
 
-        <!-- PSU VOLTAGE & EFFICIENCY TELEMETRY -->
         <div class="card-item" style="padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">PSU Power Telemetry</div>
@@ -2344,7 +2953,6 @@
             </div>
         </div>
 
-        <!-- LIVE PROFITABILITY LEDGER -->
         <div class="card-item" style="padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Live Profitability Ledger</div>
@@ -2365,11 +2973,11 @@
                 <span class="ledger-value pos" id="ledgerGross">+0.00000000 BTC/hr</span>
             </div>
             <div class="ledger-row">
-                <span class="ledger-label">Power Cost (0.082 $/kWh)</span>
+                <span class="ledger-label">Power Cost (<span id="ledgerRateLabel">0.082</span> $/kWh)</span>
                 <span class="ledger-value neg" id="ledgerPower">-0.00000000 BTC/hr</span>
             </div>
             <div class="ledger-row">
-                <span class="ledger-label">Pool Maintenance (1.0%)</span>
+                <span class="ledger-label">Pool Maintenance (<span id="ledgerFeeLabel">1.0</span>%)</span>
                 <span class="ledger-value neg" id="ledgerFee">-0.00000000 BTC/hr</span>
             </div>
             <div class="ledger-row" style="border-top: 1px solid var(--border); padding-top:10px; margin-top:6px;">
@@ -2378,21 +2986,116 @@
             </div>
         </div>
 
-        <!-- 7-DAY EARNINGS MINI CHART -->
+        <div class="payout-countdown-card">
+            <div class="payout-header">
+                <div class="payout-title">Next Payout</div>
+                <span class="badge-green" style="font-size:9px;">AUTO</span>
+            </div>
+            <div class="payout-timer" id="payoutTimer">4h 22m 18s</div>
+            <div class="payout-progress">
+                <div class="payout-progress-fill" id="payoutProgressFill" style="width:9.6%"></div>
+            </div>
+            <div class="payout-footer">
+                <span id="payoutCurrent">0.00048 / 0.00500 BTC</span>
+                <span id="payoutEst">Est: 0.0048 BTC</span>
+            </div>
+        </div>
+
+        <!-- MINING FORECAST CARD -->
+        <div class="forecast-card">
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px;">Mining Forecast</div>
+            <div class="forecast-row">
+                <span class="forecast-label">30-day projection</span>
+                <span class="forecast-value green" id="forecast30d">0.00432 BTC</span>
+            </div>
+            <div class="forecast-row">
+                <span class="forecast-label">Next payout in</span>
+                <span class="forecast-value">~18 hours</span>
+            </div>
+            <div class="forecast-row">
+                <span class="forecast-label">Next rig upgrade in</span>
+                <span class="forecast-value amber" id="forecastRig">42 days</span>
+            </div>
+        </div>
+
+        <!-- MINING CONTRACT CARD -->
+        <div class="contract-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Contract</div>
+                <span class="badge-purple" style="font-size:9px;">ENTERPRISE</span>
+            </div>
+            <div class="contract-row">
+                <span class="contract-label">Tier</span>
+                <span class="contract-value purple">Enterprise</span>
+            </div>
+            <div class="contract-row">
+                <span class="contract-label">Expires in</span>
+                <span class="contract-value">120 days</span>
+            </div>
+            <div class="contract-row">
+                <span class="contract-label">Renewal cost</span>
+                <span class="contract-value">0.005 BTC</span>
+            </div>
+            <button class="secondary-btn" style="margin-top:10px;" onclick="showToast('Coming Soon', 'Contract renewal will be available soon', 'info')">Renew <span class="soon-badge" style="margin-left:6px;">Soon</span></button>
+        </div>
+
+        <!-- NODE MAP -->
+        <div class="card-item" style="padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Global Node Map</div>
+                <span class="badge-green" style="font-size:9px;" id="activeNodeLabel">FRA-Node-4</span>
+            </div>
+            <div class="node-map">
+                <svg viewBox="0 0 400 160" preserveAspectRatio="xMidYMid meet">
+                    <path d="M30,40 Q60,30 90,45 Q120,55 100,80 Q80,95 60,90 Q40,85 30,60 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                    <path d="M95,95 Q115,100 120,125 Q118,150 105,155 Q95,150 95,130 Q93,110 95,95 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                    <path d="M170,45 Q195,40 210,50 Q215,65 205,75 Q190,80 175,70 Q168,55 170,45 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                    <path d="M180,85 Q210,80 225,95 Q230,120 215,145 Q195,150 185,130 Q175,105 180,85 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                    <path d="M220,40 Q280,30 340,50 Q360,70 340,90 Q300,100 260,90 Q230,75 220,40 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                    <path d="M310,125 Q340,120 355,135 Q350,150 330,150 Q315,145 310,125 Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                    
+                    <circle cx="185" cy="58" r="4" fill="#10b981" opacity="0.9">
+                        <animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.9;0.5;0.9" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <text x="195" y="62" fill="#10b981" font-size="7" font-family="JetBrains Mono">FRA 🇩🇪</text>
+                    
+                    <circle cx="82" cy="68" r="3" fill="#60a5fa" opacity="0.8">
+                        <animate attributeName="r" values="3;5;3" dur="2.5s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <text x="60" y="78" fill="#60a5fa" font-size="7" font-family="JetBrains Mono">IAD 🇺🇸</text>
+                    
+                    <circle cx="272" cy="98" r="3" fill="#a855f7" opacity="0.8">
+                        <animate attributeName="r" values="3;5;3" dur="3s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                    <text x="282" y="102" fill="#a855f7" font-size="7" font-family="JetBrains Mono">SGP 🇸🇬</text>
+                    
+                    <circle cx="338" cy="72" r="3" fill="#fbbf24" opacity="0.8">
+                        <animate attributeName="r" values="3;5;3" dur="2.8s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values="0.8;0.4;0.8" dur="2.8s" repeatCount="indefinite"/>
+                    </circle>
+                    <text x="325" y="62" fill="#fbbf24" font-size="7" font-family="JetBrains Mono">TYO 🇯🇵</text>
+                </svg>
+            </div>
+            <div style="font-size:9.5px; color:var(--text-muted); font-family:var(--font-mono); text-align:center; margin-top:8px;">
+                Active node: <span style="color:var(--accent-green);" id="mapActiveNode">FRA-Node-4</span> · Latency 12ms
+            </div>
+        </div>
+
         <div class="card-item" style="padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                 <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">7-Day Earnings</div>
                 <span style="font-size:10px; color:var(--accent-green); font-family:var(--font-mono);" id="sevenDayTotal">+0.00000000 BTC</span>
             </div>
             <div class="mini-chart" id="miniChart">
-                <!-- Bars injected by JS -->
             </div>
             <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--text-muted); font-family:var(--font-mono); margin-top:16px; padding:0 4px;">
                 <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
             </div>
         </div>
 
-        <!-- HARDWARE TELEMETRY -->
         <div class="card-item" style="padding:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Hardware Telemetry</div>
@@ -2408,7 +3111,27 @@
             </div>
         </div>
 
-        <!-- TERMINAL -->
+        <div class="carbon-card">
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:8px;">Sustainability</div>
+            <div class="carbon-row">
+                <span class="carbon-label">⚡ Energy Used</span>
+                <span class="carbon-value" id="carbonEnergy">0.0 kWh</span>
+            </div>
+            <div class="carbon-row">
+                <span class="carbon-label">🌱 Carbon Offset</span>
+                <span class="carbon-value green" id="carbonOffset">100%</span>
+            </div>
+            <div class="carbon-row">
+                <span class="carbon-label">🌳 Trees Planted</span>
+                <span class="carbon-value" id="carbonTrees">2</span>
+            </div>
+            <div style="font-size:9px; color:var(--accent-green); font-family:var(--font-mono); text-align:center; margin-top:6px;">Verified green mining</div>
+        </div>
+
+        <div class="share-log" id="shareLog">
+            <div style="text-align:center; color:var(--text-muted); font-size:9.5px; padding:20px 0;">Share log will appear when mining starts</div>
+        </div>
+
         <div class="terminal" id="terminal">
             <div class="terminal-line">
                 <span class="term-time">[--:--:--]</span>
@@ -2430,16 +3153,16 @@
         </div>
 
         <button class="secondary-btn" style="padding: 14px; margin-top: 8px;" onclick="withdrawFunds()">Withdraw Funds</button>
+        <button class="secondary-btn" style="padding: 10px; margin-top: 8px; font-size: 12px;" onclick="openWithdrawalHistory()">📜 View Withdrawal History</button>
     </main>
 
     <!-- ==================== CLUSTERS / RIGS ==================== -->
     <main class="page" id="page-rigs">
         <div class="section-title">
             Hardware Store
-            <span class="count">4 nodes</span>
+            <span class="count">4 rigs available</span>
         </div>
 
-        <!-- Firmware update banner (hidden by default) -->
         <div class="firmware-update-banner" id="firmwareUpdateBanner" style="display:none;">
             <div class="icon">⚡</div>
             <div class="body">
@@ -2453,31 +3176,13 @@
         </div>
 
         <div class="card-item">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
-                <div>
-                    <div style="font-weight:700; font-size:14px;">Antminer S21 Pro</div>
-                    <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Standard Enterprise Allocation</div>
-                </div>
-                <span class="badge-green">Active</span>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Available Rigs</div>
+                <span class="badge-gold" style="font-size:9px;">MARKETPLACE</span>
             </div>
-            <div style="display:flex; gap:16px; margin-bottom:14px;">
-                <div>
-                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">HASHRATE</div>
-                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono);" id="rigHash">234 TH/s</div>
-                </div>
-                <div>
-                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">POWER</div>
-                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono);">3510W</div>
-                </div>
-                <div>
-                    <div style="font-size:10px; color:var(--text-muted); font-weight:600;">EFFICIENCY</div>
-                    <div style="font-size:14px; font-weight:700; font-family:var(--font-mono); color:var(--accent-green);">15 J/TH</div>
-                </div>
-            </div>
-            <button class="secondary-btn" onclick="haptic('light'); showModal('Node Active', 'Antminer S21 Pro is currently allocated and generating hashrate on your account.', 'check')">Deployed</button>
+            <div id="rigMarketplace"></div>
         </div>
 
-        <!-- FIRMWARE MODES -->
         <div class="card-item">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">ASIC Firmware Mode</div>
@@ -2505,7 +3210,38 @@
             </div>
         </div>
 
-        <!-- POWER COST CALCULATOR -->
+        <!-- HASHRATE BREAKDOWN CHART -->
+        <div class="card-item">
+            <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:12px;">Hashrate Breakdown</div>
+            <div id="hashrateBreakdown"></div>
+        </div>
+
+        <div class="card-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Mining Pool</div>
+                <span class="badge-green" style="font-size:9px;" id="activePoolBadge">ANTPOOL</span>
+            </div>
+            <div id="poolList">
+            </div>
+        </div>
+
+        <div class="card-item">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Compound Reinvest</div>
+                <div class="toggle-switch" id="compoundToggle" onclick="toggleCompound()"></div>
+            </div>
+            <div style="font-size:11px; color:var(--text-secondary); margin-bottom:8px;" id="compoundDesc">
+                Manual mode — earnings accrue
+            </div>
+            <div class="compound-progress-bar">
+                <div class="compound-progress-fill" id="compoundProgressFill" style="width:0%"></div>
+            </div>
+            <div class="compound-progress-label">
+                <span id="compoundProgressLabel">0% to next rig upgrade</span>
+                <span id="compoundTarget">0.028 BTC</span>
+            </div>
+        </div>
+
         <div class="card-item">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                 <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Power Cost Calculator</div>
@@ -2537,7 +3273,6 @@
             </div>
         </div>
 
-        <!-- POOL ROUTING -->
         <div class="card-item">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
                 <div style="font-size:11px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px;">Stratum v2 Pool Routing</div>
@@ -2665,7 +3400,6 @@
                     <div style="font-size:16px; font-weight:700; font-family:var(--font-mono); color:var(--accent-green);">0.00241000</div>
                 </div>
             </div>
-            <!-- Tier 1 progress -->
             <div style="margin-top:12px;">
                 <div style="display:flex; justify-content:space-between; font-size:10px; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:4px;">
                     <span>Tier 1 progress</span>
@@ -2677,7 +3411,27 @@
             </div>
         </div>
 
-        <!-- TOP REFERRERS LIST -->
+        <div class="share-earnings-card">
+            <div class="share-earnings-text">
+                I'm earning <span class="highlight">0.0024 BTC</span> through<br>@BTCMinerBot!
+            </div>
+            <div class="share-earnings-preview" id="sharePreview">
+                t.me/BTCMinerBot?start=ref_anax99
+            </div>
+            <div class="share-btn-row">
+                <button class="share-btn" onclick="copyShareText()">
+                    📤 Copy Text
+                </button>
+                <button class="share-btn" onclick="copyRef()">
+                    🔗 Copy Link
+                </button>
+                <button class="share-btn primary" onclick="shareEarnings()">
+                    📱 Share
+                </button>
+            </div>
+            <button class="secondary-btn" style="margin-top:8px;" onclick="showReferralQR()">📱 Show Referral QR</button>
+        </div>
+
         <div class="card-item">
             <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:10px;">Top Referrers</div>
             <div class="referrer-row">
@@ -2762,7 +3516,6 @@
             </span>
         </div>
 
-        <!-- User Position Bar -->
         <div class="user-position-bar">
             <div class="user-pos-header">
                 <div class="user-pos-label">Your Global Rank</div>
@@ -2778,7 +3531,6 @@
         </div>
 
         <div class="leaderboard-list" id="leaderboardList" style="margin-top:4px;">
-            <!-- Leaderboard rows injected by JS -->
         </div>
         <div style="font-size:10px; color:var(--text-muted); text-align:center; font-family:var(--font-mono); margin-top:6px;">
             Showing <span id="visibleCount">30</span> of <span id="totalCount">12,847</span>+ miners
@@ -2858,6 +3610,9 @@
             </div>
             <button class="support-close" onclick="closeSupportChat()">✕</button>
         </div>
+        <div style="padding: 10px 16px; border-bottom: 1px solid var(--border);">
+            <button class="secondary-btn small accent" style="width: 100%;" onclick="openTicketModal()">🎫 Create Support Ticket</button>
+        </div>
         <div class="support-messages" id="supportMessages">
             <div class="msg-bubble bot">
                 Welcome to BTC MINER Enterprise Support. I'm your AI assistant. How can I help you with your mining operation today?
@@ -2888,7 +3643,46 @@
         try { tg.setBackgroundColor?.('#090b10'); } catch(e) {}
 
         // ============================================================
-        // STATE
+        // USER STATE (for persistence)
+        // ============================================================
+        let userState = {
+            userId: null,
+            username: null,
+            firstName: null,
+            lastName: null,
+            photoUrl: null,
+            isPremium: false,
+            accountCreated: Date.now(),
+            btc: 0.00000000,
+            totalMined: 0.00000000,
+            sessionsCompleted: 0,
+            sessionHistory: [],
+            vipTier: 'bronze',
+            miningStreak: 12,
+            loginStreak: 0,
+            lastLoginClaim: 0,
+            ownedRigs: ['s21pro'],
+            activePoolId: 'antpool',
+            firmwareMode: 'balanced',
+            compoundMode: false,
+            notifPrefs: {
+                payout: true, thermal: true, marketing: false,
+                referral: true, difficulty: true, price: true
+            },
+            dailyReportEnabled: true,
+            priceAlert: 0,
+            referralCount: 8,
+            referralEarnings: 0.00241,
+            userRank: 847,
+            withdrawalHistory: [],
+            activityLog: [],
+            sevenDayEarnings: [0.00021, 0.00024, 0.00019, 0.00026, 0.00022, 0.00025, 0.00012],
+            lastUpdated: Date.now(),
+            lastKnownBtcPrice: 69500
+        };
+
+        // ============================================================
+        // STATE (mirrors userState for UI)
         // ============================================================
         let active = false;
         let initializing = false;
@@ -2899,6 +3693,7 @@
         let lastPriceUpdate = 0;
         let blockHeight = 872_341;
         let networkDiff = 92.67;
+        let networkDiffChange = 0.82;
         let networkHashrate = 642.1;
         let uptimeSeconds = 0;
         let walletConnected = false;
@@ -2912,6 +3707,10 @@
         let sessionMinedBtc = 0;
         let miningStartTime = 0;
         let lastMilestone = 0;
+        let sessionStartTime = 0;
+        let sessionSharesAccepted = 0;
+        let sessionSharesStale = 0;
+        let miningButtonLocked = false;
 
         // VIP Tier
         let vipTier = 'bronze';
@@ -2937,8 +3736,24 @@
 
         // Profitability
         let ELECTRICITY_RATE = 0.082;
-        const POOL_FEE_PCT = 0.01;
-        let grossYieldBTC = 0, powerCostBTC = 0, poolFeeBTC = 0, netProfitBTC = 0;
+        let POOL_FEE_PCT = 0.01;
+
+        // Pool config
+        const POOLS = [
+            { id: 'antpool', name: 'Antpool', fee: 1.0, uptime: 99.8, latency: 12 },
+            { id: 'f2pool', name: 'F2Pool', fee: 1.5, uptime: 99.6, latency: 18 },
+            { id: 'slushpool', name: 'Slushpool', fee: 2.0, uptime: 99.9, latency: 22 },
+            { id: 'btccom', name: 'BTC.com', fee: 0.9, uptime: 99.4, latency: 15 }
+        ];
+        let activePoolId = 'antpool';
+
+        // Hardware shop
+        const RIGS = [
+            { id: 's19j', name: 'Antminer S19j Pro', hash: 104, power: 3250, efficiency: 29, price: 0.012, owned: false },
+            { id: 's21', name: 'Antminer S21', hash: 200, power: 3500, efficiency: 17, price: 0.022, owned: false },
+            { id: 's21pro', name: 'Antminer S21 Pro', hash: 234, power: 3510, efficiency: 15, price: 0.028, owned: true },
+            { id: 'm50s', name: 'Whatsminer M50S++', hash: 132, power: 3276, efficiency: 25, price: 0.014, owned: false }
+        ];
 
         // Share acceptance & voltage
         let shareAcceptPct = 99.8;
@@ -2948,6 +3763,7 @@
         let shareCounter = 0;
         let staleSharePct = 0.3;
         let rejectedSharePct = 0.1;
+        let hashStability = 99.2;
 
         // Pool luck
         let poolLuck = 104.2;
@@ -2956,12 +3772,11 @@
         let mempoolTxns = 14822;
 
         // Difficulty adjustment
-        let diffAdjustBlocksRemaining = 2016 - 512; // blocks remaining
-        let diffAdjustTotalBlocks = 2016;
+        let diffAdjustBlocksRemaining = 2016 - 512;
         let diffAdjustProjection = 0.82;
 
         // Halving
-        let halvingBlocksRemaining = 147456; // approx
+        let halvingBlocksRemaining = 147456;
         let halvingDaysRemaining = 1024;
 
         // Streak
@@ -2976,7 +3791,6 @@
         let datacenterFlag = '🇩🇪';
 
         // Firmware update
-        let firmwareUpdateAvailable = false;
         let firmwareUpdateDismissed = false;
 
         // Achievements
@@ -2986,6 +3800,48 @@
             { id: 'week_streak',  name: '1 Week Streak',      desc: '7-day mining streak', unlocked: true,  icon: '🔥' },
             { id: 'shares_10000', name: '10,000 Shares',      desc: '10K shares accepted', unlocked: false, icon: '⚡' },
             { id: 'halving_watch',name: 'Halving Watcher',    desc: 'Wait for next halving', unlocked: false, icon: '⏳' }
+        ];
+
+        // Compound reinvest
+        let compoundMode = false;
+
+        // Share log
+        let shareLogEntries = [];
+        let shareLogId = 1242;
+
+        // Carbon counter
+        let energyUsedKwh = 0;
+
+        // Payout countdown (in seconds)
+        let payoutCountdownSec = 4 * 3600 + 22 * 60 + 18;
+
+        // Notification prefs
+        let notifPrefs = {
+            payout: true,
+            thermal: true,
+            marketing: false,
+            referral: true,
+            difficulty: true,
+            price: true
+        };
+
+        // Daily report toggle
+        let dailyReportEnabled = true;
+
+        // Price alert
+        let priceAlert = 0;
+
+        // Daily login
+        let lastLoginClaim = 0;
+        let loginStreak = 0;
+
+        // Withdrawal history
+        const WITHDRAWAL_HISTORY = [
+            { id: 'TX8421', date: '2025-01-15', amount: 0.0025, status: 'confirmed', hash: '0x3a4f...c21d' },
+            { id: 'TX8398', date: '2025-01-08', amount: 0.0018, status: 'confirmed', hash: '0x8f3a...e17b' },
+            { id: 'TX8367', date: '2025-01-02', amount: 0.0032, status: 'confirmed', hash: '0x1b2c...9a4d' },
+            { id: 'TX8341', date: '2024-12-26', amount: 0.0015, status: 'confirmed', hash: '0x7d5e...b82f' },
+            { id: 'TX8312', date: '2024-12-18', amount: 0.0021, status: 'failed', hash: '—' }
         ];
 
         // Workers
@@ -3154,7 +4010,9 @@
         let loop = null, termInterval = null, telemetryInterval = null, marketWs = null, marketRest = null,
             blockInterval = null, countdownInterval = null, uptimeInterval = null, rankInterval = null,
             ledgerInterval = null, workerInterval = null, notifInterval = null, payoutInterval = null,
-            diffInterval = null, poolLuckInterval = null, mempoolInterval = null, weatherInterval = null;
+            diffInterval = null, poolLuckInterval = null, mempoolInterval = null, weatherInterval = null,
+            shareLogInterval = null, payoutCountdownInterval = null, stabilityInterval = null, sessionTimerInterval = null,
+            autoSaveInterval = null;
 
         // Audio
         let audioCtx = null, fanOscillator = null, fanGain = null;
@@ -3178,6 +4036,369 @@
             68950, 69120, 69080, 69340, 69210, 69450, 69380, 69520, 69680, 69540,
             69720, 69860, 69780, 69940, 69820, 70010, 69950, 70120, 70040, 70210
         ];
+
+        // Chart data for 24h modal
+        let chart24hData = [];
+
+        // ============================================================
+        // USER AUTHENTICATION & STATE PERSISTENCE
+        // ============================================================
+        function getTelegramUser() {
+            try {
+                const user = tg.initDataUnsafe?.user;
+                if (user && user.id) {
+                    return {
+                        id: 'tg_' + user.id,
+                        username: user.username || `user_${user.id}`,
+                        firstName: user.first_name || 'Miner',
+                        lastName: user.last_name || '',
+                        languageCode: user.language_code || 'en',
+                        photoUrl: user.photo_url || null,
+                        isPremium: user.is_premium || false
+                    };
+                }
+            } catch(e) {}
+            return null;
+        }
+
+        function saveUserState() {
+            if (!userState.userId) return;
+            try {
+                // Properly accumulate totalMined
+                const lastBtc = userState.btc || 0;
+                if (btc > lastBtc) {
+                    userState.totalMined = (userState.totalMined || 0) + (btc - lastBtc);
+                }
+                userState.btc = btc;
+                userState.vipTier = vipTier;
+                userState.miningStreak = miningStreak;
+                userState.loginStreak = loginStreak;
+                userState.lastLoginClaim = lastLoginClaim;
+                userState.activePoolId = activePoolId;
+                userState.firmwareMode = firmwareMode;
+                userState.compoundMode = compoundMode;
+                userState.notifPrefs = notifPrefs;
+                userState.dailyReportEnabled = dailyReportEnabled;
+                userState.priceAlert = priceAlert;
+                userState.userRank = userRank;
+                userState.sevenDayEarnings = sevenDayEarnings;
+                userState.ownedRigs = RIGS.filter(r => r.owned).map(r => r.id);
+                userState.lastUpdated = Date.now();
+                userState.lastKnownBtcPrice = btcPrice;
+                localStorage.setItem(`btcminer_state_${userState.userId}`, JSON.stringify(userState));
+                localStorage.setItem('btcminer_lastUser', userState.userId);
+            } catch(e) {
+                console.warn('Save failed:', e);
+            }
+        }
+
+        function loadUserState() {
+            try {
+                const lastUserId = localStorage.getItem('btcminer_lastUser');
+                if (!lastUserId) return null;
+                const raw = localStorage.getItem(`btcminer_state_${lastUserId}`);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch(e) {
+                return null;
+            }
+        }
+
+        function resetUserState() {
+            try {
+                localStorage.removeItem(`btcminer_state_${userState.userId}`);
+                localStorage.removeItem('btcminer_lastUser');
+            } catch(e) {}
+        }
+
+        function logActivity(action, details = '') {
+            userState.activityLog.unshift({
+                action,
+                details,
+                timestamp: Date.now()
+            });
+            if (userState.activityLog.length > 50) userState.activityLog.pop();
+            saveUserState();
+        }
+
+        function getInitial(name) {
+            if (!name) return 'M';
+            const firstChar = name.trim().charAt(0).toUpperCase();
+            return /[A-Z0-9]/.test(firstChar) ? firstChar : 'M';
+        }
+
+        function updateUserProfileUI() {
+            const avatarEl = document.getElementById('userAvatar');
+            const nameEl = document.getElementById('userDisplayName');
+            if (!avatarEl || !nameEl) return;
+
+            if (userState.photoUrl) {
+                avatarEl.innerHTML = `<img src="${userState.photoUrl}" alt="">`;
+            } else {
+                avatarEl.textContent = getInitial(userState.firstName);
+            }
+
+            const displayName = userState.firstName +
+                (userState.lastName ? ' ' + userState.lastName[0] + '.' : '');
+            nameEl.textContent = displayName.length > 12 ?
+                displayName.substring(0, 10) + '...' :
+                displayName;
+        }
+
+        function restoreUIFromState() {
+            btc = userState.btc || 0;
+            updateBalanceOdometer(btc);
+            document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+
+            vipTier = userState.vipTier || 'bronze';
+            updateVIPTier();
+
+            miningStreak = userState.miningStreak || 12;
+            const streakEl = document.getElementById('streakBadge');
+            if (streakEl) streakEl.innerText = `🔥 ${miningStreak} day streak`;
+
+            RIGS.forEach(rig => {
+                rig.owned = (userState.ownedRigs || []).includes(rig.id);
+            });
+            renderRigMarketplace();
+            renderHashrateBreakdown();
+
+            activePoolId = userState.activePoolId || 'antpool';
+            const pool = POOLS.find(p => p.id === activePoolId);
+            if (pool) POOL_FEE_PCT = pool.fee / 100;
+            renderPoolList();
+            const badge = document.getElementById('activePoolBadge');
+            if (badge && pool) badge.innerText = pool.name.toUpperCase();
+            const feeLabel = document.getElementById('ledgerFeeLabel');
+            if (feeLabel && pool) feeLabel.innerText = pool.fee.toFixed(1);
+
+            firmwareMode = userState.firmwareMode || 'balanced';
+            ['eco', 'balanced', 'insane'].forEach(m => {
+                const el = document.getElementById('fw-' + m);
+                if (el) el.classList.toggle('active', m === firmwareMode);
+            });
+            const fwBadge = document.getElementById('firmwareBadge');
+            if (fwBadge) {
+                const cfg = FIRMWARE_CONFIG[firmwareMode];
+                fwBadge.innerText = cfg.label;
+                fwBadge.className = firmwareMode === 'insane' ? 'badge-red' : (firmwareMode === 'eco' ? 'badge-slate' : 'badge-green');
+            }
+
+            compoundMode = userState.compoundMode || false;
+            const cToggle = document.getElementById('compoundToggle');
+            if (cToggle) cToggle.classList.toggle('on', compoundMode);
+            const cDesc = document.getElementById('compoundDesc');
+            if (cDesc) cDesc.innerText = compoundMode ? 'Auto-reinvest earnings enabled' : 'Manual mode — earnings accrue';
+
+            notifPrefs = userState.notifPrefs || notifPrefs;
+            dailyReportEnabled = userState.dailyReportEnabled !== false;
+            priceAlert = userState.priceAlert || 0;
+
+            userRank = userState.userRank || 847;
+            renderLeaderboard();
+
+            sevenDayEarnings = userState.sevenDayEarnings || sevenDayEarnings;
+            updateMiniChart();
+
+            lastLoginClaim = userState.lastLoginClaim || 0;
+            loginStreak = userState.loginStreak || 0;
+
+            updateCompoundProgress();
+            updateWalletPreview();
+        }
+
+        function showWelcomeModal() {
+            const html = `
+                <div style="text-align:center; margin-bottom:16px;">
+                    <div style="font-size:14px; color:var(--text-secondary); line-height:1.6; margin-bottom:14px;">
+                        Your mining rig is ready. Start earning BTC now.
+                    </div>
+                    <div style="text-align:left; font-size:12px; color:var(--text-secondary); line-height:1.8;">
+                        <div>⚡ Tap <strong style="color:var(--accent-green);">Start Allocation</strong> to begin mining</div>
+                        <div>💎 Upgrade your rig with BTC earnings</div>
+                        <div>👥 Invite friends to earn 12% commission</div>
+                    </div>
+                </div>
+                <button class="secondary-btn accent" onclick="closeModal()">Let's Go!</button>
+            `;
+            showModal(`Welcome, ${userState.firstName}!`, 'You\'re all set to start mining', 'check', html);
+        }
+
+        function initUser() {
+            const tgUser = getTelegramUser();
+            const savedState = loadUserState();
+
+            if (savedState && tgUser && savedState.userId === tgUser.id) {
+                userState = savedState;
+                restoreUIFromState();
+                if (Date.now() - (savedState.lastUpdated || 0) > 3600000) {
+                    setTimeout(() => {
+                        showToast('Welcome back!', `Good to see you, ${userState.firstName}`, 'success');
+                    }, 1500);
+                }
+            } else if (tgUser) {
+                userState.userId = tgUser.id;
+                userState.username = tgUser.username;
+                userState.firstName = tgUser.firstName;
+                userState.lastName = tgUser.lastName;
+                userState.photoUrl = tgUser.photoUrl;
+                userState.isPremium = tgUser.isPremium;
+                userState.accountCreated = Date.now();
+                saveUserState();
+                setTimeout(showWelcomeModal, 1000);
+            } else {
+                userState.userId = 'guest_' + Date.now();
+                userState.username = 'guest_miner';
+                userState.firstName = 'Guest';
+                userState.lastName = 'Miner';
+                userState.accountCreated = Date.now();
+                saveUserState();
+                setTimeout(showWelcomeModal, 1000);
+            }
+
+            updateUserProfileUI();
+        }
+
+        // ============================================================
+        // PROFILE MODAL
+        // ============================================================
+        function openProfileModal() {
+            haptic('medium');
+            const created = new Date(userState.accountCreated || Date.now());
+            const createdStr = created.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+            const shortId = (userState.userId || 'unknown').substring(0, 16);
+
+            let avatarHtml = '';
+            if (userState.photoUrl) {
+                avatarHtml = `<img src="${userState.photoUrl}" alt="">`;
+            } else {
+                avatarHtml = getInitial(userState.firstName);
+            }
+
+            const activitiesHtml = (userState.activityLog || []).slice(0, 5).map(a => {
+                const t = new Date(a.timestamp);
+                const timeStr = t.toTimeString().split(' ')[0];
+                return `<div class="activity-log-item"><span class="activity-log-time">[${timeStr}]</span>${a.action}${a.details ? ' · ' + a.details : ''}</div>`;
+            }).join('') || '<div style="color:var(--text-muted); text-align:center; padding:10px 0;">No activity yet</div>';
+
+            const unlockCount = achievements.filter(a => a.unlocked).length;
+
+            const html = `
+                <div class="profile-header">
+                    <div class="profile-avatar-large">${avatarHtml}</div>
+                    <div class="profile-name">${userState.firstName || 'Miner'} ${userState.lastName || ''}</div>
+                    <div class="profile-username">@${userState.username || 'guest'}</div>
+                    <div style="font-size:9px; color:var(--text-muted); font-family:var(--font-mono); margin-top:4px;">ID: ${shortId}</div>
+                    <div style="font-size:9px; color:var(--text-muted); font-family:var(--font-mono); margin-top:2px;">Member since ${createdStr}</div>
+                    ${userState.isPremium ? '<div style="margin-top:6px;"><span class="badge-gold" style="font-size:9px;">⭐ TELEGRAM PREMIUM</span></div>' : ''}
+                </div>
+
+                <div class="profile-stats-grid">
+                    <div class="profile-stat">
+                        <div class="profile-stat-label">Total Mined</div>
+                        <div class="profile-stat-value">${btc.toFixed(8)}</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-label">Sessions</div>
+                        <div class="profile-stat-value">${userState.sessionsCompleted || 0}</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-label">Achievements</div>
+                        <div class="profile-stat-value">${unlockCount}/${achievements.length}</div>
+                    </div>
+                    <div class="profile-stat">
+                        <div class="profile-stat-label">VIP Tier</div>
+                        <div class="profile-stat-value" style="color:var(--accent-gold);">${VIP_TIERS[vipTier].name}</div>
+                    </div>
+                </div>
+
+                <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; text-align:left; margin-bottom:6px;">Recent Activity</div>
+                <div class="activity-log">${activitiesHtml}</div>
+
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+                    <button class="secondary-btn small" onclick="exportUserData()">📥 Export</button>
+                    <button class="secondary-btn small" onclick="importUserData()">📤 Import</button>
+                </div>
+                <button class="secondary-btn small" style="background:rgba(239,68,68,0.1); color:var(--accent-red); border-color:rgba(239,68,68,0.3);" onclick="logoutUser()">🚪 Logout</button>
+            `;
+            showModal('My Profile', 'Account details & activity', 'check', html);
+
+            // Scroll modal body to top
+            setTimeout(() => {
+                const modalBody = document.querySelector('.modal-body');
+                if (modalBody) modalBody.scrollTop = 0;
+            }, 50);
+        }
+
+        function exportUserData() {
+            haptic('medium');
+            const exportData = {
+                version: '1.0',
+                exportedAt: new Date().toISOString(),
+                state: userState
+            };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)],
+                { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `btc-miner-backup-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Export Complete', 'Your data has been downloaded', 'success');
+        }
+
+        function importUserData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (data.state && data.state.userId) {
+                            userState = data.state;
+                            saveUserState();
+                            location.reload();
+                        } else {
+                            showToast('Invalid Backup', 'File format not recognized', 'error');
+                        }
+                    } catch(err) {
+                        showToast('Import Failed', 'Could not parse JSON file', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function logoutUser() {
+            haptic('warning');
+            closeModal();
+            setTimeout(() => {
+                showModal('Logout?', 'Your data will be cleared from this device. Make sure you have exported a backup first.', 'warn', `
+                    <button class="secondary-btn accent" onclick="confirmLogout()" style="margin-bottom:8px;">Yes, Logout</button>
+                    <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+                `);
+            }, 300);
+        }
+
+        function confirmLogout() {
+            resetUserState();
+            haptic('success');
+            closeModal();
+            setTimeout(() => {
+                showToast('Logged Out', 'Your local data has been cleared', 'success');
+            }, 400);
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        }
 
         // ============================================================
         // MARKET FEED
@@ -3206,6 +4427,20 @@
             if (sparklineData.length > 20) sparklineData.shift();
             updateSparkline();
             updatePriceSourceIndicator(true);
+            updateWalletPreview();
+            updateMiningForecast();
+            checkPriceAlert();
+        }
+
+        function checkPriceAlert() {
+            if (priceAlert > 0 && btcPrice >= priceAlert) {
+                showToast('Price Alert!', `BTC has reached $${priceAlert.toLocaleString()}`, 'success');
+                if (notifPrefs.price) {
+                    pushNotification('Price Alert Triggered', `BTC reached $${btcPrice.toLocaleString()}`, 'info');
+                }
+                priceAlert = 0;
+                saveUserState();
+            }
         }
 
         function connectBinanceWebSocket() {
@@ -3318,6 +4553,12 @@
                 badge.innerText = (priceChangePct >= 0 ? '+' : '') + priceChangePct.toFixed(2) + '%';
                 badge.className = 'change-badge ' + (priceChangePct >= 0 ? 'pos' : 'neg');
             }
+            const diffChangeEl = document.getElementById('tickerDiffChange');
+            if (diffChangeEl) {
+                const sign = networkDiffChange >= 0 ? '▲' : '▼';
+                diffChangeEl.innerText = sign + Math.abs(networkDiffChange).toFixed(2) + '%';
+                diffChangeEl.className = 'ticker-value ' + (networkDiffChange >= 0 ? 'red' : 'green');
+            }
         }
 
         function updateSparkline() {
@@ -3395,7 +4636,7 @@
             if (fillEl) fillEl.style.width = progressPct + '%';
             if (projEl) {
                 projEl.innerText = (diffAdjustProjection >= 0 ? '+' : '') + diffAdjustProjection.toFixed(2) + '%';
-                projEl.style.color = diffAdjustProjection >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+                projEl.style.color = diffAdjustProjection >= 0 ? 'var(--accent-red)' : 'var(--accent-green)';
             }
             if (blockEl) blockEl.innerText = '#' + blockHeight.toLocaleString();
         }
@@ -3411,7 +4652,7 @@
             haptic('light');
             if (pageId === 'ranks') { updateRank(); renderLeaderboard(); }
             if (pageId === 'workers') renderWorkers();
-            if (pageId === 'rigs') updatePowerCalculator();
+            if (pageId === 'rigs') { updatePowerCalculator(); renderRigMarketplace(); renderPoolList(); renderHashrateBreakdown(); }
         }
 
         // ============================================================
@@ -3498,7 +4739,7 @@
         // VIP TIER
         // ============================================================
         function updateVIPTier() {
-            const totalHash = active ? 142.5 * FIRMWARE_CONFIG[firmwareMode].hashrateMult : 0;
+            const totalHash = active ? getTotalHashrate() : 0;
             let newTier = 'bronze';
             if (totalHash >= VIP_TIERS.whale.minHash) newTier = 'whale';
             else if (totalHash >= VIP_TIERS.diamond.minHash) newTier = 'diamond';
@@ -3506,7 +4747,6 @@
             else if (totalHash >= VIP_TIERS.silver.minHash) newTier = 'silver';
 
             if (newTier !== vipTier) {
-                const oldTier = vipTier;
                 vipTier = newTier;
                 const tier = VIP_TIERS[vipTier];
                 const badge = document.getElementById('vipBadge');
@@ -3515,9 +4755,9 @@
                 badge.innerText = icons[vipTier] + ' ' + tier.name + ' Member';
                 showAchievementUnlock(icons[vipTier], `${tier.name} Tier Unlocked!`, `Airdrop multiplier increased to ${tier.airdropMult}x`);
                 addTerminalLog(`VIP tier upgraded → ${tier.name} (${tier.airdropMult}x airdrop)`, 'info');
+                saveUserState();
             }
 
-            // Update VIP progress bar
             const tier = VIP_TIERS[vipTier];
             const progressEl = document.getElementById('vipProgressLabel');
             const pctEl = document.getElementById('vipProgressPct');
@@ -3537,6 +4777,12 @@
                 if (pctEl) pctEl.innerText = '100%';
                 if (fillEl) fillEl.style.width = '100%';
             }
+        }
+
+        function getTotalHashrate() {
+            let base = 142.5 * FIRMWARE_CONFIG[firmwareMode].hashrateMult;
+            RIGS.forEach(r => { if (r.owned && r.id !== 's21pro') base += r.hash; });
+            return base;
         }
 
         // ============================================================
@@ -3568,16 +4814,9 @@
             addTerminalLog(`Firmware mode changed → ${cfg.label}`, mode === 'insane' ? 'warn' : '');
             updateVIPTier();
             updatePowerCalculator();
-
-            // Show firmware update banner if insane and mining for 5 min
-            if (mode === 'insane' && active) {
-                setTimeout(() => {
-                    if (!firmwareUpdateDismissed && active && firmwareMode === 'insane') {
-                        firmwareUpdateAvailable = true;
-                        document.getElementById('firmwareUpdateBanner').style.display = 'flex';
-                    }
-                }, 5000);
-            }
+            renderHashrateBreakdown();
+            logActivity(`Firmware → ${cfg.label}`);
+            saveUserState();
         }
 
         function applyFirmwareUpdate() {
@@ -3589,7 +4828,7 @@
                 haptic('success');
                 showToast('Firmware Updated', 'v4.2.2 installed — +2% hashrate, -5% power draw', 'success');
                 addTerminalLog('Firmware updated → v4.2.2', 'info');
-                firmwareUpdateAvailable = false;
+                logActivity('Firmware updated to v4.2.2');
             }, 3000);
         }
 
@@ -3601,43 +4840,192 @@
         }
 
         // ============================================================
-        // POOL ROUTING
+        // POOL SELECTOR
         // ============================================================
-        function onPoolSlider(changed) {
-            const us = parseInt(document.getElementById('sliderUs').value);
-            const eu = parseInt(document.getElementById('sliderEu').value);
-            const asia = parseInt(document.getElementById('sliderAsia').value);
-            const total = us + eu + asia || 1;
-            const norm = (v) => Math.round((v / total) * 100);
-            let nUs = norm(us), nEu = norm(eu), nAsia = norm(asia);
-            let diff = 100 - (nUs + nEu + nAsia);
-            if (diff !== 0) {
-                if (changed === 'us') nEu += diff;
-                else if (changed === 'eu') nAsia += diff;
-                else nUs += diff;
-            }
-            poolUs = nUs; poolEu = nEu; poolAsia = nAsia;
-            updatePoolUI();
-            const current = { us: poolUs, eu: poolEu, asia: poolAsia };
-            if (Math.abs(current[changed] - lastSliderHaptic[changed]) >= 10) {
-                haptic('light');
-                lastSliderHaptic[changed] = current[changed];
-            }
+        function renderPoolList() {
+            const list = document.getElementById('poolList');
+            if (!list) return;
+            list.innerHTML = '';
+            POOLS.forEach(p => {
+                const el = document.createElement('div');
+                el.className = 'pool-option' + (p.id === activePoolId ? ' selected' : '');
+                el.onclick = () => selectPool(p.id);
+                el.innerHTML = `
+                    <div class="pool-option-left">
+                        <div class="pool-name">${p.name}</div>
+                        <div class="pool-meta">
+                            <span class="fee">Fee ${p.fee}%</span>
+                            <span class="uptime">Uptime ${p.uptime}%</span>
+                            <span class="latency">Latency ${p.latency}ms</span>
+                        </div>
+                    </div>
+                    <div class="pool-check">✓</div>
+                `;
+                list.appendChild(el);
+            });
         }
 
-        function updatePoolUI() {
-            document.getElementById('sliderUsVal').innerText = poolUs + '%';
-            document.getElementById('sliderEuVal').innerText = poolEu + '%';
-            document.getElementById('sliderAsiaVal').innerText = poolAsia + '%';
-            document.getElementById('distUs').style.width = poolUs + '%';
-            document.getElementById('distEu').style.width = poolEu + '%';
-            document.getElementById('distAsia').style.width = poolAsia + '%';
-            document.getElementById('legendUs').innerText = poolUs + '%';
-            document.getElementById('legendEu').innerText = poolEu + '%';
-            document.getElementById('legendAsia').innerText = poolAsia + '%';
-            document.getElementById('sliderUs').style.setProperty('--val', poolUs + '%');
-            document.getElementById('sliderEu').style.setProperty('--val', poolEu + '%');
-            document.getElementById('sliderAsia').style.setProperty('--val', poolAsia + '%');
+        function selectPool(poolId) {
+            if (activePoolId === poolId) return;
+            activePoolId = poolId;
+            const pool = POOLS.find(p => p.id === poolId);
+            POOL_FEE_PCT = pool.fee / 100;
+            haptic('light');
+            renderPoolList();
+            const badge = document.getElementById('activePoolBadge');
+            if (badge) badge.innerText = pool.name.toUpperCase();
+            const feeLabel = document.getElementById('ledgerFeeLabel');
+            if (feeLabel) feeLabel.innerText = pool.fee.toFixed(1);
+            showToast('Pool Switched', `Active pool: ${pool.name}`, 'success');
+            addTerminalLog(`Switched to ${pool.name} pool (fee ${pool.fee}%)`, 'info');
+            updateLedgerUI();
+            logActivity(`Pool → ${pool.name}`);
+            saveUserState();
+        }
+
+        // ============================================================
+        // HARDWARE SHOP
+        // ============================================================
+        function renderRigMarketplace() {
+            const container = document.getElementById('rigMarketplace');
+            if (!container) return;
+            container.innerHTML = '';
+            RIGS.forEach(rig => {
+                const el = document.createElement('div');
+                el.className = 'rig-card' + (rig.owned ? ' owned' : '');
+                el.setAttribute('data-rig-id', rig.id);
+                const canBuy = btc >= rig.price && !rig.owned;
+                el.innerHTML = `
+                    <div class="rig-header">
+                        <div class="rig-name">${rig.name}</div>
+                        ${rig.owned ? '<span class="badge-green" style="font-size:9px;">OWNED</span>' : ''}
+                    </div>
+                    <div class="rig-stats">
+                        <div class="rig-stat">
+                            <div class="rig-stat-label">HASHRATE</div>
+                            <div class="rig-stat-value green">${rig.hash} TH/s</div>
+                        </div>
+                        <div class="rig-stat">
+                            <div class="rig-stat-label">POWER</div>
+                            <div class="rig-stat-value">${rig.power}W</div>
+                        </div>
+                        <div class="rig-stat">
+                            <div class="rig-stat-label">EFFICIENCY</div>
+                            <div class="rig-stat-value green">${rig.efficiency} J/TH</div>
+                        </div>
+                    </div>
+                    <div class="rig-footer">
+                        <span class="rig-price">${rig.price.toFixed(3)} BTC</span>
+                        <button class="rig-btn" ${rig.owned ? 'disabled' : ''} onclick="buyRig('${rig.id}')">
+                            ${rig.owned ? 'Owned' : (canBuy ? 'Buy Now' : 'Need ' + (rig.price - btc).toFixed(4) + ' BTC')}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function refreshMarketplaceButtons() {
+            RIGS.forEach(rig => {
+                if (rig.owned) return;
+                const card = document.querySelector(`[data-rig-id="${rig.id}"]`);
+                if (!card) return;
+                const btn = card.querySelector('.rig-btn');
+                if (!btn) return;
+                const canBuy = btc >= rig.price;
+                btn.disabled = !canBuy;
+                btn.textContent = canBuy ? 'Buy Now' : `Need ${(rig.price - btc).toFixed(4)} BTC`;
+            });
+        }
+
+        function buyRig(rigId) {
+            const rig = RIGS.find(r => r.id === rigId);
+            if (!rig || rig.owned) return;
+            if (btc < rig.price) {
+                haptic('error');
+                showToast('Insufficient Balance', `You need ${(rig.price - btc).toFixed(4)} more BTC`, 'error');
+                return;
+            }
+            btc -= rig.price;
+            rig.owned = true;
+            haptic('success');
+            updateBalanceOdometer(btc);
+            document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+            renderRigMarketplace();
+            updateVIPTier();
+            updateCompoundProgress();
+            renderHashrateBreakdown();
+            showToast('Rig Purchased!', `${rig.name} added to your fleet`, 'success');
+            addTerminalLog(`Rig purchased: ${rig.name} (${rig.hash} TH/s)`, 'info');
+            pushNotification('New Rig Deployed', `${rig.name} is now hashing for your account`, 'info');
+            logActivity(`Purchased ${rig.name}`);
+            saveUserState();
+        }
+
+        // ============================================================
+        // HASHRATE BREAKDOWN
+        // ============================================================
+        function renderHashrateBreakdown() {
+            const container = document.getElementById('hashrateBreakdown');
+            if (!container) return;
+            const ownedRigs = RIGS.filter(r => r.owned);
+            const totalHash = ownedRigs.reduce((sum, r) => sum + r.hash, 0);
+            if (totalHash === 0) {
+                container.innerHTML = '<div style="font-size:11px; color:var(--text-muted); text-align:center; padding:20px 0;">No rigs owned yet</div>';
+                return;
+            }
+            const colors = ['#10b981', '#60a5fa', '#a855f7', '#fbbf24'];
+            let html = '<div style="display:flex; gap:8px; align-items:center; margin-bottom:12px;">';
+            html += '<svg viewBox="0 0 42 42" style="width:80px; height:80px;">';
+            let offset = 0;
+            ownedRigs.forEach((rig, i) => {
+                const pct = (rig.hash / totalHash) * 100;
+                const dashArray = `${(pct / 100) * 125.6} 125.6`;
+                html += `<circle cx="21" cy="21" r="20" fill="none" stroke="${colors[i % colors.length]}" stroke-width="4" stroke-dasharray="${dashArray}" stroke-dashoffset="${-offset * 1.256}" transform="rotate(-90 21 21)"/>`;
+                offset += pct;
+            });
+            html += '</svg>';
+            html += '<div style="flex:1;">';
+            ownedRigs.forEach((rig, i) => {
+                const pct = ((rig.hash / totalHash) * 100).toFixed(0);
+                html += `<div style="display:flex; align-items:center; gap:6px; font-size:10px; font-family:var(--font-mono); padding:2px 0;">
+                    <span style="width:8px; height:8px; border-radius:50%; background:${colors[i % colors.length]};"></span>
+                    <span style="color:var(--text-secondary); flex:1;">${rig.name}</span>
+                    <span style="color:var(--text-primary); font-weight:700;">${pct}%</span>
+                </div>`;
+            });
+            html += '</div></div>';
+            container.innerHTML = html;
+        }
+
+        // ============================================================
+        // COMPOUND REINVEST
+        // ============================================================
+        function toggleCompound() {
+            compoundMode = !compoundMode;
+            const toggle = document.getElementById('compoundToggle');
+            toggle.classList.toggle('on', compoundMode);
+            haptic('medium');
+            const desc = document.getElementById('compoundDesc');
+            if (compoundMode) {
+                desc.innerText = 'Auto-reinvest earnings enabled';
+                addTerminalLog('Compound reinvest enabled', 'info');
+            } else {
+                desc.innerText = 'Manual mode — earnings accrue';
+                addTerminalLog('Compound reinvest disabled', 'info');
+            }
+            updateCompoundProgress();
+            logActivity(`Compound ${compoundMode ? 'ON' : 'OFF'}`);
+            saveUserState();
+        }
+
+        function updateCompoundProgress() {
+            const target = 0.028;
+            const pct = Math.min(100, Math.max(0, (btc / target) * 100));
+            const fill = document.getElementById('compoundProgressFill');
+            const label = document.getElementById('compoundProgressLabel');
+            if (fill) fill.style.width = pct + '%';
+            if (label) label.innerText = `${pct.toFixed(0)}% to next rig upgrade`;
         }
 
         // ============================================================
@@ -3646,12 +5034,15 @@
         function updatePowerCalculator() {
             const slider = document.getElementById('powerRateSlider');
             if (!slider) return;
-            const rate = parseFloat(slider.value) / 100; // convert to $/kWh
+            const rate = parseFloat(slider.value) / 100;
             ELECTRICITY_RATE = rate;
             slider.style.setProperty('--val', ((parseFloat(slider.value) - 2) / 18 * 100) + '%');
 
             const rateVal = document.getElementById('powerRateVal');
             if (rateVal) rateVal.innerText = '$' + rate.toFixed(3) + '/kWh';
+
+            const rateLabel = document.getElementById('ledgerRateLabel');
+            if (rateLabel) rateLabel.innerText = rate.toFixed(3);
 
             const cfg = FIRMWARE_CONFIG[firmwareMode];
             const powerW = 3510 * cfg.powerMult;
@@ -3661,9 +5052,8 @@
             const dailyCostEl = document.getElementById('calcDailyCost');
             if (dailyCostEl) dailyCostEl.innerText = '$' + dailyCost.toFixed(2);
 
-            // Break-even: BTC price where mining yield = power cost
             const hashTH = 234.2 * cfg.hashrateMult;
-            const dailyBtcYield = (hashTH / 1e6) * 6.25 * 0.00000001 * 86400; // approx
+            const dailyBtcYield = (hashTH / 1e6) * 6.25 * 0.00000001 * 86400;
             const breakeven = dailyCost / Math.max(dailyBtcYield, 0.00000001);
             const breakevenEl = document.getElementById('calcBreakeven');
             if (breakevenEl) breakevenEl.innerText = '$' + Math.round(breakeven).toLocaleString();
@@ -3710,7 +5100,9 @@
             haptic('error');
             addTerminalLog('⚠ THERMAL THROTTLING WARNING — Core temp exceeded 82°C', 'red');
             addTerminalLog('Node entered protective lockout state', 'warn');
-            pushNotification('Thermal Throttling Warning', 'Core temperature exceeded 82°C. Node locked out. Manual repair required.', 'error');
+            if (notifPrefs.thermal) {
+                pushNotification('Thermal Throttling Warning', 'Core temperature exceeded 82°C. Node locked out. Manual repair required.', 'error');
+            }
         }
 
         function openRepairMinigame() {
@@ -3860,7 +5252,10 @@
                 active = true;
                 initializing = false;
                 miningStartTime = Date.now();
+                sessionStartTime = Date.now();
                 sessionMinedBtc = 0;
+                sessionSharesAccepted = 0;
+                sessionSharesStale = 0;
                 reactorSpeedTarget = 0.004;
             }, 250);
 
@@ -3872,11 +5267,9 @@
                 haptic('heavy');
                 btn.classList.add('running');
                 btn.disabled = false;
-                btn.innerText = 'Stop Allocation';
                 badge.classList.add('active');
                 statusText.innerText = 'Node Active';
                 heroCard.classList.add('mining-active');
-                document.getElementById('hashSub').innerText = 'Mining...';
                 document.getElementById('tempSub').innerText = 'Active';
                 document.getElementById('fanIcon').classList.add('spinning');
                 document.getElementById('fanBadge').innerText = 'ACTIVE';
@@ -3885,6 +5278,8 @@
                 vibratePattern([30, 20, 30]);
                 updateVIPTier();
                 startMiningLoops();
+                startShareLog();
+                startSessionTimer();
                 rippleWaves.push({ radius: 80, alpha: 0.8 });
                 rippleTimer = setInterval(() => {
                     if (active && rippleWaves.length < 1) {
@@ -3892,38 +5287,52 @@
                     }
                 }, 1200);
                 showToast('Mining Started', 'Node is now generating hashrate', 'success');
+                logActivity('Mining started');
+                saveUserState();
             }, 500);
         }
 
         function startMiningLoops() {
-            // SLOWER earnings: 1200ms interval, 0.00000008 BTC increment
             loop = setInterval(() => {
                 if (!active) return;
                 const cfg = FIRMWARE_CONFIG[firmwareMode];
-                const increment = (0.00000008 * cfg.hashrateMult) + (Math.random() * 0.00000002);
+                const increment = (0.00000010 * cfg.hashrateMult) + (Math.random() * 0.00000002);
                 btc += increment;
                 sessionMinedBtc += increment;
                 sevenDayEarnings[todayEarningsIndex] += increment;
                 updateBalanceOdometer(btc);
                 document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
-                const hashRate = (142.5 * cfg.hashrateMult + Math.random() * 8.5);
+                const hashRate = getTotalHashrate() + Math.random() * 8.5;
                 document.getElementById('hashVal').innerText = hashRate.toFixed(1) + " TH/s";
                 const rankBtcEl = document.getElementById('rankBtc');
                 if (rankBtcEl) rankBtcEl.innerText = btc.toFixed(8) + ' BTC';
-                document.getElementById('userHashDisplay').innerText = (142.5 * cfg.hashrateMult).toFixed(1) + ' TH/s';
+                document.getElementById('userHashDisplay').innerText = getTotalHashrate().toFixed(1) + ' TH/s';
 
-                const rateSatPerSec = (increment * 1e8) / 1.2;
-                document.getElementById('balanceRate').innerText = '+' + rateSatPerSec.toFixed(6) + ' sat/s';
+                const rateSatPerMin = (increment * 1e8) / 1.5 * 60;
+                document.getElementById('balanceRate').innerText = '+' + rateSatPerMin.toFixed(4) + ' sat/min';
 
-                // Milestone threshold 0.00000200
-                if (btc - lastMilestone >= 0.00000200) {
+                if (btc - lastMilestone >= 0.00000300) {
                     lastMilestone = btc;
                     haptic('success');
                 }
 
-                // Update 7-day chart (throttled)
-                if (Math.random() < 0.1) updateMiniChart();
-            }, 1200);
+                const powerW = 3510 * cfg.powerMult;
+                energyUsedKwh += (powerW / 1000) * (1.5 / 3600);
+                const carbonEl = document.getElementById('carbonEnergy');
+                if (carbonEl) carbonEl.innerText = energyUsedKwh.toFixed(2) + ' kWh';
+                const treesEl = document.getElementById('carbonTrees');
+                if (treesEl) treesEl.innerText = Math.max(1, Math.floor(energyUsedKwh / 40));
+
+                updateWalletPreview();
+                updateCompoundProgress();
+                updatePayoutProgress();
+                updateMiningForecast();
+
+                if (Math.random() < 0.1) {
+                    updateMiniChart();
+                    refreshMarketplaceButtons();
+                }
+            }, 1500);
 
             telemetryInterval = setInterval(() => {
                 if (!active) return;
@@ -3938,7 +5347,7 @@
                     return;
                 } else if (temp > 80 && thermalState !== 'warn80' && thermalState !== 'lockout') {
                     thermalState = 'warn80';
-                    showToast('Temperature Warning', 'Core temp exceeded 80°C. Reduce firmware or improve cooling.', 'warn');
+                    if (notifPrefs.thermal) showToast('Temperature Warning', 'Core temp exceeded 80°C. Reduce firmware or improve cooling.', 'warn');
                     haptic('warning');
                 } else if (temp > 78 && thermalState !== 'warn78' && thermalState !== 'warn80' && thermalState !== 'lockout') {
                     thermalState = 'warn78';
@@ -3972,7 +5381,6 @@
                 document.getElementById('shareAcceptVal').innerText = shareAcceptPct.toFixed(1) + '%';
                 document.getElementById('shareSub').innerText = `Valid · ${shareValid.toLocaleString()} / ${shareTotal.toLocaleString()}`;
 
-                // Update stale share display
                 staleSharePct = 0.2 + Math.random() * 0.3;
                 rejectedSharePct = 0.05 + Math.random() * 0.1;
                 const staleEl = document.getElementById('staleVal');
@@ -4008,6 +5416,19 @@
         }
 
         function stopMiningSequence() {
+            if (sessionTimerInterval) { clearInterval(sessionTimerInterval); sessionTimerInterval = null; }
+
+            const sessionDuration = Math.floor((Date.now() - sessionStartTime) / 1000);
+            const summaryData = {
+                duration: sessionDuration,
+                hashrate: getTotalHashrate(),
+                mined: sessionMinedBtc,
+                sharesAccepted: sessionSharesAccepted,
+                sharesStale: sessionSharesStale,
+                powerW: 3510 * FIRMWARE_CONFIG[firmwareMode].powerMult,
+                stability: hashStability
+            };
+
             active = false;
             initializing = false;
             haptic('light');
@@ -4026,7 +5447,7 @@
             badge.classList.remove('active');
             statusText.innerText = 'Node Idle';
             heroCard.classList.remove('mining-active');
-            document.getElementById('hashSub').innerText = '—';
+            document.getElementById('hashStability').innerText = 'Stability: 99.2%';
             document.getElementById('tempSub').innerText = 'Idle';
             document.getElementById('fanIcon').classList.remove('spinning');
             document.getElementById('fanBadge').innerText = 'IDLE';
@@ -4043,6 +5464,7 @@
             stopFanSound();
             clearInterval(loop); clearInterval(termInterval); clearInterval(telemetryInterval);
             if (rippleTimer) { clearInterval(rippleTimer); rippleTimer = null; }
+            if (shareLogInterval) { clearInterval(shareLogInterval); shareLogInterval = null; }
             rippleWaves = [];
             reactorSpeedTarget = 0.002;
             document.getElementById('hashVal').innerText = "0.0 TH/s";
@@ -4052,12 +5474,55 @@
             document.getElementById('shareSub').innerText = 'Valid · 1,240 / 1,242';
             document.getElementById('voltageVal').innerText = '12.1V';
             document.getElementById('voltageSub').innerText = '±0.05V ripple';
+
+            shareLogEntries = [];
+            const logEl = document.getElementById('shareLog');
+            if (logEl) logEl.innerHTML = '<div style="text-align:center;color:var(--text-muted);font-size:9.5px;padding:20px 0;">Share log will appear when mining starts</div>';
+            sessionSharesAccepted = 0;
+            sessionSharesStale = 0;
+
             addTerminalLog('Mining allocation stopped — node idle', 'warn');
             updateVIPTier();
+            updateCompoundProgress();
             thermalState = 'normal';
+
+            const h = Math.floor(sessionDuration / 3600);
+            const m = Math.floor((sessionDuration % 3600) / 60);
+            const s = sessionDuration % 60;
+            const durStr = h > 0 ? `${h}h ${m}m` : (m > 0 ? `${m}m ${s}s` : `${s}s`);
+            logActivity(`Mining stopped (${durStr})`);
+            userState.sessionsCompleted = (userState.sessionsCompleted || 0) + 1;
+            saveUserState();
+
+            setTimeout(() => showSessionSummary(summaryData), 300);
+        }
+
+        function showSessionSummary(data) {
+            const h = Math.floor(data.duration / 3600);
+            const m = Math.floor((data.duration % 3600) / 60);
+            const s = data.duration % 60;
+            const durationStr = h > 0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
+            const usd = (data.mined * btcPrice).toFixed(2);
+
+            const html = `
+                <div style="text-align:left; font-family:var(--font-mono); font-size:11.5px; line-height:2;">
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">⏱ Duration</span><span style="color:var(--text-primary); font-weight:700;">${durationStr}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">⚡ Avg Hashrate</span><span style="color:var(--text-primary); font-weight:700;">${data.hashrate.toFixed(1)} TH/s</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">💰 Total Mined</span><span style="color:var(--accent-green); font-weight:700;">${data.mined.toFixed(8)} BTC</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">💵 USD Value</span><span style="color:var(--accent-green); font-weight:700;">$${usd}</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">✅ Shares</span><span style="color:var(--text-primary); font-weight:700;">${data.sharesAccepted} accepted, ${data.sharesStale} stale</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">🔋 Avg Power</span><span style="color:var(--text-primary); font-weight:700;">${Math.round(data.powerW)}W</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span style="color:var(--text-muted);">📊 Stability</span><span style="color:var(--accent-green); font-weight:700;">${data.stability.toFixed(1)}%</span></div>
+                </div>
+            `;
+            showModal('Session Summary', 'Your mining session has ended.', 'check', html);
         }
 
         function toggleMining() {
+            if (miningButtonLocked) return;
+            miningButtonLocked = true;
+            setTimeout(() => { miningButtonLocked = false; }, 500);
+
             if (thermalLockout) {
                 haptic('error');
                 showToast('Node Locked', 'Complete thermal repair first.', 'error');
@@ -4072,7 +5537,83 @@
         }
 
         // ============================================================
-        // BALANCE ODOMETER
+        // SESSION TIMER ON BUTTON
+        // ============================================================
+        function startSessionTimer() {
+            if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+            sessionTimerInterval = setInterval(() => {
+                if (!active) return;
+                const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+                const h = Math.floor(elapsed / 3600);
+                const m = Math.floor((elapsed % 3600) / 60);
+                let timeStr;
+                if (h > 9) timeStr = `${h}h`;
+                else if (h > 0) timeStr = `${h}h ${m}m`;
+                else timeStr = `${m}m`;
+                const btn = document.getElementById('toggleBtn');
+                if (btn && btn.classList.contains('running')) {
+                    btn.innerText = `Stop (${timeStr})`;
+                }
+            }, 1000);
+        }
+
+        // ============================================================
+        // SHARE LOG TICKER
+        // ============================================================
+        function startShareLog() {
+            if (shareLogInterval) clearInterval(shareLogInterval);
+            shareLogEntries = [];
+            const log = document.getElementById('shareLog');
+            if (log) log.innerHTML = '';
+
+            shareLogInterval = setInterval(() => {
+                if (!active) return;
+                const r = Math.random();
+                let status, statusText, statusClass;
+                if (r < 0.94) {
+                    status = 'accepted'; statusText = '✓ ACCEPTED'; statusClass = 'accepted';
+                    sessionSharesAccepted++;
+                } else if (r < 0.98) {
+                    status = 'stale'; statusText = '⚠ STALE'; statusClass = 'stale';
+                    sessionSharesStale++;
+                } else {
+                    status = 'rejected'; statusText = '✗ REJECTED'; statusClass = 'rejected';
+                }
+                shareLogId++;
+                const now = new Date();
+                const time = now.toTimeString().split(' ')[0];
+                addShareLogEntry({
+                    time,
+                    id: shareLogId,
+                    diff: '12.8T',
+                    status,
+                    statusText,
+                    statusClass
+                });
+            }, 3000 + Math.random() * 2000);
+        }
+
+        function addShareLogEntry(entry) {
+            shareLogEntries.push(entry);
+            if (shareLogEntries.length > 8) shareLogEntries.shift();
+            const log = document.getElementById('shareLog');
+            if (!log) return;
+            log.innerHTML = '';
+            shareLogEntries.slice().reverse().forEach(e => {
+                const line = document.createElement('div');
+                line.className = `share-log-line ${e.statusClass}`;
+                line.innerHTML = `
+                    <span class="share-log-time">[${e.time}]</span>
+                    <span class="share-log-id">Share #${e.id}</span>
+                    <span class="share-log-diff">· diff ${e.diff}</span>
+                    <span class="share-log-status status">· ${e.statusText}</span>
+                `;
+                log.appendChild(line);
+            });
+        }
+
+        // ============================================================
+        // BALANCE ODOMETER — Only last 3 digits animate
         // ============================================================
         let lastBalanceStr = '0.00000000';
         function updateBalanceOdometer(newVal) {
@@ -4080,20 +5621,22 @@
             if (!el) return;
             const newStr = newVal.toFixed(8);
             if (newStr === lastBalanceStr) return;
+
             let html = '';
             for (let i = 0; i < newStr.length; i++) {
                 const ch = newStr[i];
                 const prevCh = lastBalanceStr[i] || '';
                 const isDigit = /[0-9]/.test(ch);
                 const differs = ch !== prevCh;
-                const cls = isDigit && differs ? 'digit roll-up' : 'digit';
+                const shouldAnimate = isDigit && differs && i >= newStr.length - 3;
+                const cls = shouldAnimate ? 'digit roll-up' : 'digit';
                 html += `<span class="${cls}" data-idx="${i}">${ch}</span>`;
             }
             el.innerHTML = html;
             lastBalanceStr = newStr;
             setTimeout(() => {
                 el.querySelectorAll('.digit.roll-up').forEach(d => d.classList.remove('roll-up'));
-            }, 400);
+            }, 500);
         }
 
         // ============================================================
@@ -4118,12 +5661,11 @@
         function startLedger() {
             ledgerInterval = setInterval(() => {
                 if (!active) {
-                    grossYieldBTC = 0; powerCostBTC = 0; poolFeeBTC = 0; netProfitBTC = 0;
                     updateLedgerUI();
                     return;
                 }
                 const cfg = FIRMWARE_CONFIG[firmwareMode];
-                const hashTH = 234.2 * cfg.hashrateMult;
+                const hashTH = getTotalHashrate();
                 const powerW = 3510 * cfg.powerMult;
                 grossYieldBTC = (hashTH / 1e6) * 6.25 * 0.00000001 * 3600;
                 const powerCostUSD = (powerW / 1000) * ELECTRICITY_RATE;
@@ -4146,6 +5688,84 @@
             const netEl = document.getElementById('ledgerNet');
             netEl.innerText = (net >= 0 ? '+' : '') + net.toFixed(10) + ' BTC/hr';
             netEl.className = 'ledger-value ' + (net >= 0 ? 'pos' : 'neg');
+        }
+
+        // ============================================================
+        // PAYOUT COUNTDOWN
+        // ============================================================
+        function startPayoutCountdown() {
+            if (payoutCountdownInterval) clearInterval(payoutCountdownInterval);
+            payoutCountdownInterval = setInterval(() => {
+                if (payoutCountdownSec > 0) payoutCountdownSec--;
+                const h = Math.floor(payoutCountdownSec / 3600);
+                const m = Math.floor((payoutCountdownSec % 3600) / 60);
+                const s = payoutCountdownSec % 60;
+                const el = document.getElementById('payoutTimer');
+                if (el) el.innerText = `${h}h ${m}m ${s}s`;
+            }, 1000);
+        }
+
+        function updatePayoutProgress() {
+            const threshold = 0.005;
+            const current = btc % threshold;
+            const pct = (current / threshold) * 100;
+            const fillEl = document.getElementById('payoutProgressFill');
+            const currentEl = document.getElementById('payoutCurrent');
+            const estEl = document.getElementById('payoutEst');
+            if (fillEl) fillEl.style.width = pct + '%';
+            if (currentEl) currentEl.innerText = `${current.toFixed(5)} / ${threshold.toFixed(5)} BTC`;
+            if (estEl) estEl.innerText = `Est: ${(threshold - current).toFixed(4)} BTC`;
+        }
+
+        // ============================================================
+        // MINING FORECAST
+        // ============================================================
+        function updateMiningForecast() {
+            const cfg = FIRMWARE_CONFIG[firmwareMode];
+            const hashTH = getTotalHashrate() * cfg.hashrateMult;
+            const dailyBtc = (hashTH / 1e6) * 6.25 * 0.00000001 * 86400;
+            const thirtyDay = dailyBtc * 30;
+            const el = document.getElementById('forecast30d');
+            if (el) el.innerText = thirtyDay.toFixed(5) + ' BTC';
+            const rigTarget = 0.028;
+            const rigDays = Math.ceil((rigTarget - btc) / Math.max(dailyBtc, 0.00000001));
+            const rigEl = document.getElementById('forecastRig');
+            if (rigEl) rigEl.innerText = rigDays > 0 ? rigDays + ' days' : 'Ready!';
+        }
+
+        // ============================================================
+        // WALLET PREVIEW
+        // ============================================================
+        let lastWalletValues = { est: 0, wd: 0, pend: 0 };
+        function updateWalletPreview() {
+            const estBalance = btc * 0.7;
+            const withdrawable = btc * 0.5;
+            const pending = btc * 0.2;
+            const e1 = document.getElementById('walletEstBalance');
+            const e2 = document.getElementById('walletWithdrawable');
+            const e3 = document.getElementById('walletPending');
+            if (e1) {
+                if (Math.abs(estBalance - lastWalletValues.est) > 0.000000001) {
+                    e1.classList.add('updating');
+                    setTimeout(() => e1.classList.remove('updating'), 200);
+                }
+                e1.innerText = estBalance.toFixed(8) + ' BTC';
+            }
+            if (e2) {
+                if (Math.abs(withdrawable - lastWalletValues.wd) > 0.000000001) {
+                    e2.classList.add('updating');
+                    setTimeout(() => e2.classList.remove('updating'), 200);
+                }
+                e2.innerText = withdrawable.toFixed(8) + ' BTC';
+            }
+            if (e3) {
+                if (Math.abs(pending - lastWalletValues.pend) > 0.000000001) {
+                    e3.classList.add('updating');
+                    setTimeout(() => e3.classList.remove('updating'), 200);
+                }
+                e3.innerText = pending.toFixed(8) + ' BTC';
+            }
+            lastWalletValues = { est: estBalance, wd: withdrawable, pend: pending };
         }
 
         // ============================================================
@@ -4310,6 +5930,7 @@
                     <div class="toast-body">${body}</div>
                 </div>
             `;
+            // FIX: Append to container instead of body
             container.appendChild(toast);
             setTimeout(() => {
                 toast.classList.add('out');
@@ -4334,7 +5955,7 @@
         }
 
         // ============================================================
-        // COMPACT SIDE PAYOUT TOASTS — SINGLE LINE, REAL NAMES
+        // COMPACT SIDE PAYOUT TOASTS
         // ============================================================
         function generateRandomPayout() {
             const p = PAYOUT_NAMES[Math.floor(Math.random() * PAYOUT_NAMES.length)];
@@ -4381,6 +6002,27 @@
         }
 
         // ============================================================
+        // DAILY PROFIT REPORT
+        // ============================================================
+        function startDailyReport() {
+            setTimeout(() => {
+                if (!dailyReportEnabled) { startDailyReport(); return; }
+                if (!active) { startDailyReport(); return; }
+                const gross = grossYieldBTC * 24;
+                const power = powerCostBTC * 24;
+                const fee = poolFeeBTC * 24;
+                const net = netProfitBTC * 24;
+                const usd = (net * btcPrice).toFixed(2);
+                showToast('Daily Report', `Yesterday: ${net.toFixed(5)} BTC ($${usd}) net`, 'success');
+                addTerminalLog(`Daily report: Gross ${gross.toFixed(5)} BTC · Power ${power.toFixed(5)} BTC · Fee ${fee.toFixed(5)} BTC · Net ${net.toFixed(5)} BTC`, 'info');
+                if (notifPrefs.payout) {
+                    pushNotification('Daily Profit Report', `Net profit: ${net.toFixed(5)} BTC ($${usd})`, 'info');
+                }
+                startDailyReport();
+            }, 20 * 60 * 1000 + Math.random() * 20 * 60 * 1000);
+        }
+
+        // ============================================================
         // LEADERBOARD
         // ============================================================
         let leaderboardNewMembers = 0;
@@ -4393,10 +6035,10 @@
             const userData = {
                 rank: userRank,
                 flag: '🇮🇳',
-                name: 'You (Anax)',
+                name: userState.firstName ? `${userState.firstName} (You)` : 'You (Anax)',
                 node: 'Personal Enterprise Node',
                 btc: btc,
-                hash: active ? 142.5 * FIRMWARE_CONFIG[firmwareMode].hashrateMult : 0,
+                hash: active ? getTotalHashrate() : 0,
                 isUser: true
             };
 
@@ -4523,6 +6165,7 @@
             showNewMinerBadge();
 
             setTimeout(() => { newEntry.isNew = false; }, 1500);
+            saveUserState();
         }
 
         function startNewMemberSimulation() {
@@ -4590,12 +6233,14 @@
         function notifyMe(walletName) {
             haptic('success');
             closeModal();
-            showToast('You\'ll be notified', `We'll alert you when ${walletName} is ready`, 'success');
+            setTimeout(() => {
+                showToast('You\'ll be notified', `We'll alert you when ${walletName} is ready`, 'success');
+            }, 400);
             addTerminalLog(`Notification request registered for ${walletName}`, 'info');
         }
 
         // ============================================================
-        // WITHDRAW (with 2FA gate)
+        // WITHDRAW
         // ============================================================
         function withdrawFunds() {
             if (!is2FAAuthenticated) {
@@ -4676,6 +6321,16 @@
         function verifyWithdrawal() {
             haptic('warning');
             if (countdownInterval) clearInterval(countdownInterval);
+            // Prepend new entry to withdrawal history
+            WITHDRAWAL_HISTORY.unshift({
+                id: 'TX' + Math.floor(8000 + Math.random() * 1000),
+                date: new Date().toISOString().split('T')[0],
+                amount: 0.00042,
+                status: 'pending',
+                hash: '⧗ pending'
+            });
+            if (WITHDRAWAL_HISTORY.length > 20) WITHDRAWAL_HISTORY.pop();
+            logActivity('Withdrawal requested', '0.00042 BTC');
             showModal('Verification Pending', 'Blockchain verification in progress. Your transaction is being confirmed by the network.', 'check', `
                 <div class="receipt">
                     <div class="line"><span>TX Status</span><span class="val amber">⧗ Broadcasting</span></div>
@@ -4688,7 +6343,24 @@
         }
 
         // ============================================================
-        // COPY / AIRDROP
+        // WITHDRAWAL HISTORY
+        // ============================================================
+        function openWithdrawalHistory() {
+            haptic('light');
+            const html = WITHDRAWAL_HISTORY.map(w => `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed rgba(255,255,255,0.05); text-align:left;">
+                    <div style="flex:1;">
+                        <div style="font-size:11px; font-family:var(--font-mono); color:var(--text-primary); font-weight:700;">${w.amount.toFixed(4)} BTC</div>
+                        <div style="font-size:9px; color:var(--text-muted); font-family:var(--font-mono); margin-top:2px;">${w.date} · ${w.hash}</div>
+                    </div>
+                    <span class="badge-${w.status === 'confirmed' ? 'green' : w.status === 'pending' ? 'amber' : 'red'}" style="font-size:9px;">${w.status.toUpperCase()}</span>
+                </div>
+            `).join('');
+            showModal('Withdrawal History', 'Your recent withdrawal transactions', 'check', html);
+        }
+
+        // ============================================================
+        // COPY / AIRDROP / SHARE
         // ============================================================
         function copyRef() {
             const input = document.getElementById('refLink');
@@ -4701,6 +6373,46 @@
                 btn.innerText = 'Copied!';
                 setTimeout(() => { btn.innerText = 'Copy'; }, 2000);
             } catch(e) { try { document.execCommand('copy'); haptic('success'); } catch(e2) {} }
+        }
+
+        function copyShareText() {
+            const text = `I'm earning 0.0024 BTC through @BTCMinerBot! Join here: t.me/BTCMinerBot?start=ref_anax99`;
+            try {
+                navigator.clipboard.writeText(text);
+                haptic('success');
+                showToast('Copied!', 'Share text copied to clipboard', 'success');
+            } catch(e) { showToast('Copy Failed', 'Please copy manually', 'error'); }
+        }
+
+        function shareEarnings() {
+            haptic('medium');
+            const text = `I'm earning 0.0024 BTC through @BTCMinerBot! Join here: t.me/BTCMinerBot?start=ref_anax99`;
+            const url = `https://t.me/BTCMinerBot?start=ref_anax99`;
+            if (tg.openTelegramLink) {
+                try {
+                    tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`);
+                    return;
+                } catch(e) {}
+            }
+            if (navigator.share) {
+                navigator.share({ title: 'BTC MINER', text: text, url: url }).catch(() => {});
+                return;
+            }
+            copyShareText();
+        }
+
+        function showReferralQR() {
+            haptic('light');
+            const qrSVG = generateQRPattern();
+            const html = `
+                <div style="text-align:center;">
+                    <div class="qr-placeholder" style="width:160px; height:160px; margin:0 auto 12px;">${qrSVG}</div>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:6px;">Scan to join BTC MINER</div>
+                    <div style="font-size:10px; font-family:var(--font-mono); color:var(--text-muted); margin-bottom:14px; word-break:break-all;">t.me/BTCMinerBot?start=ref_anax99</div>
+                    <button class="secondary-btn accent" onclick="shareEarnings(); closeModal();">📱 Share Link</button>
+                </div>
+            `;
+            showModal('Referral QR Code', 'Share your referral link', 'check', html);
         }
 
         function claimAirdrop() {
@@ -4723,21 +6435,25 @@
             btn.style.color = 'var(--text-muted)';
             btn.style.borderColor = 'var(--border)';
             addTerminalLog(`Airdrop +${scaledAmount.toFixed(8)} BTC credited (${tier.name} ${tier.airdropMult}x)`, '');
+            updateCompoundProgress();
+            updateWalletPreview();
+            refreshMarketplaceButtons();
+            logActivity(`Airdrop claimed`, `+${scaledAmount.toFixed(8)} BTC`);
+            saveUserState();
             showModal('Airdrop Claimed', `+${scaledAmount.toFixed(8)} BTC has been credited to your unconfirmed balance.<br><br><span style="color:var(--accent-green); font-size:11px;">VIP ${tier.name} multiplier: ${tier.airdropMult}x</span>`, 'check');
         }
 
         // ============================================================
-        // ACHIEVEMENTS / VIP MODAL / HALVING MODAL
+        // ACHIEVEMENTS / VIP MODAL / HALVING MODAL / SETTINGS
         // ============================================================
         function openAchievementsModal() {
             haptic('light');
-            // Update achievement unlocked states based on current progress
             achievements[0].unlocked = btc >= 0.001;
             achievements[1].unlocked = shareValid >= 1000;
             achievements[2].unlocked = miningStreak >= 7;
             achievements[3].unlocked = shareValid >= 10000;
 
-            const html = achievements.map(a => `
+            const achieveHtml = achievements.map(a => `
                 <div class="achievement-item ${a.unlocked ? 'unlocked' : 'locked'}">
                     <div class="achievement-icon">${a.icon}</div>
                     <div class="achievement-info">
@@ -4749,7 +6465,7 @@
             `).join('');
 
             const tier = VIP_TIERS[vipTier];
-            const totalHash = active ? 142.5 * FIRMWARE_CONFIG[firmwareMode].hashrateMult : 0;
+            const totalHash = active ? getTotalHashrate() : 0;
             let progressHtml = '';
             if (tier.nextTier) {
                 const nextTier = VIP_TIERS[tier.nextTier];
@@ -4770,7 +6486,73 @@
                 progressHtml = `<div style="margin-top:14px; font-size:11px; color:var(--accent-gold); font-weight:700;">🏆 MAX TIER REACHED</div>`;
             }
 
-            showModal(`Achievements & Streak`, `🔥 ${miningStreak} day streak · VIP: ${tier.name}`, 'check', html + progressHtml);
+            const settingsHtml = `
+                <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); text-align:left;">
+                    <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:10px;">Settings & Security</div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <span style="font-size:11px; color:var(--text-primary);">🔐 Two-Factor Auth</span>
+                        <button class="secondary-btn small accent" onclick="setup2FA()">Setup</button>
+                    </div>
+
+                    <div style="padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <div style="font-size:11px; color:var(--text-primary); margin-bottom:6px;">🔔 Notification Preferences</div>
+                        ${Object.keys(notifPrefs).map(key => `
+                            <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 4px;">
+                                <span style="font-size:10px; color:var(--text-muted); text-transform:capitalize;">${key}</span>
+                                <div class="toggle-switch small ${notifPrefs[key] ? 'on' : ''}" onclick="toggleNotifPref('${key}', this)"></div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div style="padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 4px;">
+                            <span style="font-size:10px; color:var(--text-muted);">Daily Report</span>
+                            <div class="toggle-switch small ${dailyReportEnabled ? 'on' : ''}" onclick="toggleDailyReport(this)"></div>
+                        </div>
+                    </div>
+
+                    <div style="padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <div style="font-size:11px; color:var(--text-primary); margin-bottom:6px;">💰 Price Alert</div>
+                        <div style="display:flex; gap:6px;">
+                            <input type="number" id="priceAlertInput" placeholder="e.g. 100000" style="flex:1; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:8px 10px; font-size:11px; color:#fff; font-family:var(--font-mono); outline:none;">
+                            <button class="secondary-btn small accent" onclick="setPriceAlert()">Set</button>
+                        </div>
+                        <div style="font-size:9px; color:var(--text-muted); font-family:var(--font-mono); margin-top:4px;" id="priceAlertStatus">${priceAlert > 0 ? `Alert set at $${priceAlert.toLocaleString()}` : 'No alert set'}</div>
+                    </div>
+
+                    <div style="display:flex; gap:6px; padding-top:10px;">
+                        <button class="secondary-btn small" onclick="exportCSV()" style="flex:1;">📥 Export CSV</button>
+                        <button class="secondary-btn small" onclick="openHealthModal()" style="flex:1;">💚 System Health</button>
+                    </div>
+                </div>
+            `;
+
+            showModal(`Achievements & Settings`, `🔥 ${miningStreak} day streak · VIP: ${tier.name}`, 'check', achieveHtml + progressHtml + settingsHtml);
+        }
+
+        function toggleDailyReport(el) {
+            dailyReportEnabled = !dailyReportEnabled;
+            el.classList.toggle('on', dailyReportEnabled);
+            haptic('light');
+            showToast('Preference Updated', `Daily report: ${dailyReportEnabled ? 'ON' : 'OFF'}`, 'success');
+            saveUserState();
+        }
+
+        function setPriceAlert() {
+            const input = document.getElementById('priceAlertInput');
+            if (!input) return;
+            const val = parseFloat(input.value);
+            if (isNaN(val) || val <= 0) {
+                showToast('Invalid Value', 'Enter a valid price', 'error');
+                return;
+            }
+            priceAlert = val;
+            haptic('success');
+            const status = document.getElementById('priceAlertStatus');
+            if (status) status.innerText = `Alert set at $${val.toLocaleString()}`;
+            showToast('Alert Set', `You'll be notified when BTC reaches $${val.toLocaleString()}`, 'success');
+            saveUserState();
         }
 
         function openHalvingModal() {
@@ -4806,6 +6588,225 @@
             setTimeout(() => {
                 if (overlay.parentNode) overlay.remove();
             }, 8000);
+        }
+
+        // ============================================================
+        // SUPPORT TICKET
+        // ============================================================
+        function openTicketModal() {
+            haptic('medium');
+            const html = `
+                <div style="text-align:left;">
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">Subject</div>
+                    <input type="text" id="ticketSubject" placeholder="Brief description" style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:12px; color:#fff; font-family:Inter; outline:none; margin-bottom:12px;">
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">Priority</div>
+                    <select id="ticketPriority" style="width:100%; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:12px; color:#fff; font-family:Inter; outline:none; margin-bottom:14px;">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                        <option value="urgent">Urgent</option>
+                    </select>
+                    <button class="secondary-btn accent" onclick="submitTicket()">Submit Ticket</button>
+                </div>
+            `;
+            showModal('🎫 Create Support Ticket', 'Our team responds within 2 hours', 'shield', html);
+        }
+
+        function submitTicket() {
+            const subjectEl = document.getElementById('ticketSubject');
+            const subject = subjectEl?.value?.trim();
+            if (!subject) {
+                haptic('error');
+                showToast('Missing Subject', 'Please enter a subject', 'error');
+                return;
+            }
+            const ticketId = '#' + Math.floor(1000 + Math.random() * 9000);
+            haptic('success');
+            closeModal();
+            setTimeout(() => {
+                showToast('Ticket Created', `Ticket ${ticketId} submitted`, 'success');
+            }, 400);
+            pushNotification('Support Ticket Created', `Ticket ${ticketId}: "${subject}"`, 'info');
+            addTerminalLog(`Support ticket ${ticketId} created — "${subject}"`, 'info');
+            logActivity(`Support ticket ${ticketId}`, subject);
+        }
+
+        // ============================================================
+        // 2FA SETUP
+        // ============================================================
+        function setup2FA() {
+            haptic('medium');
+            const secret = 'JBSWY3DPEHPK3PXP';
+            const qrSVG = generateQRPattern();
+
+            const html = `
+                <div style="text-align:center; margin-bottom:12px;">
+                    <div class="qr-placeholder" style="width:140px; height:140px;">${qrSVG}</div>
+                    <div style="font-size:10px; color:var(--text-muted); font-family:var(--font-mono); margin-bottom:4px;">Secret Key</div>
+                    <div style="font-size:12px; color:var(--accent-green); font-family:var(--font-mono); font-weight:700; letter-spacing:1px; margin-bottom:12px;">${secret}</div>
+                    <div style="font-size:11px; color:var(--text-secondary); line-height:1.5; margin-bottom:14px; text-align:left;">
+                        Scan the QR with Google Authenticator app, then enter the 6-digit code below to verify.
+                    </div>
+                    <input type="tel" maxlength="6" id="setup2FAInput" placeholder="000000" style="width:100%; padding:12px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; color:#fff; font-family:var(--font-mono); font-size:18px; text-align:center; letter-spacing:6px; outline:none; margin-bottom:12px;">
+                    <button class="secondary-btn accent" onclick="verify2FASetup()">Verify & Enable</button>
+                </div>
+            `;
+            showModal('🔐 Setup Google Authenticator', 'Secure your account with 2FA.', 'shield', html);
+        }
+
+        function verify2FASetup() {
+            const input = document.getElementById('setup2FAInput');
+            if (!input || input.value.length !== 6) {
+                haptic('error');
+                showToast('Invalid Code', 'Please enter 6 digits', 'error');
+                return;
+            }
+            haptic('success');
+            const recoveryCodes = ['A1B2C3D4', 'E5F6G7H8', 'I9J0K1L2', 'M3N4O5P6', 'Q7R8S9T0', 'U1V2W3X4', 'Y5Z6A7B8', 'C9D0E1F2'];
+            const html = `
+                <div style="text-align:left; font-size:11px; color:var(--text-secondary); margin-bottom:12px; line-height:1.5;">
+                    Save these recovery codes in a safe place. You'll need them if you lose access to your authenticator.
+                </div>
+                <div class="receipt" style="margin-bottom:14px;">
+                    ${recoveryCodes.map(c => `<div class="line"><span>${c}</span></div>`).join('')}
+                </div>
+                <button class="secondary-btn accent" onclick="closeModal(); setTimeout(() => showToast('2FA Enabled', 'Your account is now protected', 'success'), 400); addTerminalLog('2FA enabled — recovery codes generated', 'info'); logActivity('2FA enabled');">I've Saved Them</button>
+            `;
+            showModal('✅ 2FA Enabled', 'Recovery codes generated.', 'check', html);
+        }
+
+        // ============================================================
+        // NOTIFICATION PREFS
+        // ============================================================
+        function toggleNotifPref(key, el) {
+            notifPrefs[key] = !notifPrefs[key];
+            el.classList.toggle('on', notifPrefs[key]);
+            haptic('light');
+            showToast('Preference Updated', `${key}: ${notifPrefs[key] ? 'ON' : 'OFF'}`, 'success');
+            saveUserState();
+        }
+
+        // ============================================================
+        // CSV EXPORT
+        // ============================================================
+        function exportCSV() {
+            haptic('medium');
+            let csv = 'timestamp,btc_earned,hashrate,shares_accepted,shares_stale,status\n';
+            const now = Date.now();
+            for (let i = 19; i >= 0; i--) {
+                const date = new Date(now - i * 24 * 60 * 60 * 1000);
+                const dateStr = date.toISOString();
+                const earned = (0.00015 + Math.random() * 0.0001).toFixed(8);
+                const hashrate = (230 + Math.random() * 10).toFixed(1);
+                const acc = Math.floor(1000 + Math.random() * 500);
+                const stale = Math.floor(Math.random() * 5);
+                const status = 'completed';
+                csv += `${dateStr},${earned},${hashrate},${acc},${stale},${status}\n`;
+            }
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `btc-miner-history-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Export Complete', 'Exported 20 records to CSV', 'success');
+        }
+
+        // ============================================================
+        // SYSTEM HEALTH MODAL
+        // ============================================================
+        function openHealthModal() {
+            haptic('light');
+            const html = `
+                <div style="text-align:left; font-family:var(--font-mono); font-size:11px; line-height:2;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-muted);">Overall Status</span>
+                        <span style="color:var(--accent-green); font-weight:700;">● OPERATIONAL</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-muted);">Node Uptime</span>
+                        <span style="color:var(--text-primary); font-weight:700;">99.97%</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-muted);">Network Latency</span>
+                        <span style="color:var(--text-primary); font-weight:700;">12ms avg</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-muted);">Pool Response</span>
+                        <span style="color:var(--text-primary); font-weight:700;">98ms</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-muted);">API Status</span>
+                        <span style="color:var(--accent-green); font-weight:700;">All services operational</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.05);">
+                        <span style="color:var(--text-muted);">Last Incident</span>
+                        <span style="color:var(--text-primary); font-weight:700;">4 days ago</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; padding:6px 0;">
+                        <span style="color:var(--text-muted);">Support</span>
+                        <span style="color:var(--accent-green); font-weight:700;">Available 24/7</span>
+                    </div>
+                </div>
+            `;
+            showModal('💚 System Health', 'All systems operational', 'check', html);
+        }
+
+        // ============================================================
+        // 24H PRICE CHART MODAL
+        // ============================================================
+        function openPriceChartModal() {
+            haptic('light');
+            const points = [];
+            let p = btcPrice * 0.98;
+            for (let i = 0; i < 48; i++) {
+                p += (Math.random() - 0.48) * btcPrice * 0.005;
+                points.push(p);
+            }
+            points[points.length - 1] = btcPrice;
+
+            const min = Math.min(...points);
+            const max = Math.max(...points);
+            const range = max - min || 1;
+            const width = 300, height = 120;
+            const polyPoints = points.map((v, i) => {
+                const x = (i / (points.length - 1)) * width;
+                const y = height - ((v - min) / range) * (height - 20) - 10;
+                return `${x.toFixed(1)},${y.toFixed(1)}`;
+            }).join(' ');
+
+            const changeColor = priceChangePct >= 0 ? '#10b981' : '#ef4444';
+            const changeStr = (priceChangePct >= 0 ? '+' : '') + priceChangePct.toFixed(2) + '%';
+
+            const html = `
+                <div style="text-align:center; margin-bottom:8px;">
+                    <div style="font-size:24px; font-weight:800; font-family:var(--font-mono); color:var(--text-primary);">$${btcPrice.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+                    <div style="font-size:13px; font-weight:700; font-family:var(--font-mono); color:${changeColor};">${changeStr} (24h)</div>
+                </div>
+                <div style="background:#0a0c10; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px;">
+                    <svg viewBox="0 0 ${width} ${height}" style="width:100%; height:auto; aspect-ratio: 300/120; display:block;" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="${changeColor}" stop-opacity="0.3"/>
+                                <stop offset="100%" stop-color="${changeColor}" stop-opacity="0"/>
+                            </linearGradient>
+                        </defs>
+                        <polyline points="${polyPoints} 300,120 0,120" fill="url(#chartGradient)" stroke="none"/>
+                        <polyline points="${polyPoints}" fill="none" stroke="${changeColor}" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                    <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--text-muted); font-family:var(--font-mono); margin-top:4px;">
+                        <span>24h ago</span><span>12h</span><span>Now</span>
+                    </div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:10px; font-family:var(--font-mono); margin-bottom:14px;">
+                    <span style="color:var(--text-muted);">High: <span style="color:var(--accent-green); font-weight:700;">$${max.toFixed(2)}</span></span>
+                    <span style="color:var(--text-muted);">Low: <span style="color:var(--accent-red); font-weight:700;">$${min.toFixed(2)}</span></span>
+                </div>
+            `;
+            showModal('24h Price Chart', 'BTC/USDT · Binance', 'check', html);
         }
 
         // ============================================================
@@ -4931,6 +6932,23 @@
                 const s = (uptimeSeconds % 60).toString().padStart(2, '0');
                 document.getElementById('uptimeVal').innerText = `${h}:${m}:${s}`;
             }, 1000);
+        }
+
+        // ============================================================
+        // HASHRATE STABILITY
+        // ============================================================
+        function startStabilityGauge() {
+            stabilityInterval = setInterval(() => {
+                if (!active) return;
+                hashStability = 98 + Math.random() * 1.8;
+                const el = document.getElementById('hashStability');
+                if (el) {
+                    el.innerText = `Stability: ${hashStability.toFixed(1)}%`;
+                    if (hashStability >= 99) el.style.color = 'var(--accent-green)';
+                    else if (hashStability >= 97) el.style.color = 'var(--accent-amber)';
+                    else el.style.color = 'var(--accent-red)';
+                }
+            }, 5000);
         }
 
         // ============================================================
@@ -5106,9 +7124,52 @@
         }
 
         // ============================================================
+        // DAILY LOGIN REWARDS
+        // ============================================================
+        function checkDailyLogin() {
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
+            if (now - lastLoginClaim < oneDay) return;
+            const rewards = [100, 200, 300, 400, 500, 750, 1000];
+            const day = Math.min(loginStreak, 6);
+            const reward = rewards[day];
+            const html = `
+                <div style="text-align:center;">
+                    <div style="font-size:48px; margin-bottom:12px;">🎁</div>
+                    <div style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:6px;">Day ${day + 1} Reward</div>
+                    <div style="font-size:32px; font-weight:800; font-family:var(--font-mono); color:var(--accent-green); margin-bottom:14px;">+${reward} sat</div>
+                    <div style="display:flex; justify-content:center; gap:4px; margin-bottom:16px;">
+                        ${rewards.map((r, i) => `<div style="width:20px; height:20px; border-radius:50%; background:${i <= day ? 'var(--accent-green)' : 'var(--surface-3)'}; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; color:${i <= day ? '#000' : 'var(--text-muted)'};">${i+1}</div>`).join('')}
+                    </div>
+                    <button class="secondary-btn accent" onclick="claimDailyReward(${reward})">Claim Reward</button>
+                </div>
+            `;
+            showModal('Daily Login Reward', `You're on a ${loginStreak + 1} day streak!`, 'check', html);
+        }
+
+        function claimDailyReward(amount) {
+            btc += amount / 1e8;
+            lastLoginClaim = Date.now();
+            loginStreak++;
+            haptic('success');
+            updateBalanceOdometer(btc);
+            document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
+            const streakBadge = document.getElementById('streakBadge');
+            if (streakBadge) streakBadge.innerText = `🔥 ${12 + loginStreak} day streak`;
+            closeModal();
+            setTimeout(() => showToast('Reward Claimed!', `+${amount} sat added to balance`, 'success'), 400);
+            addTerminalLog(`Daily reward claimed: +${amount} sat`, 'info');
+            logActivity(`Daily login reward`, `+${amount} sat`);
+            saveUserState();
+        }
+
+        // ============================================================
         // BOOT
         // ============================================================
         document.addEventListener('DOMContentLoaded', () => {
+            // Initialize user (Telegram or Guest)
+            initUser();
+
             setTimeout(() => {
                 document.getElementById('skeletonOverlay').classList.add('hide');
             }, 300);
@@ -5128,16 +7189,33 @@
             startReactor();
             startNewMemberSimulation();
             startWeatherSimulation();
+            startStabilityGauge();
+            startPayoutCountdown();
+            startDailyReport();
 
-            // Interval-driven features
             diffInterval = setInterval(updateDiffAdjust, 10000);
             poolLuckInterval = setInterval(updatePoolLuck, 30000);
             mempoolInterval = setInterval(updateMempool, 15000);
+            setInterval(() => {
+                networkDiffChange = (Math.random() - 0.4) * 2;
+                updateMarketTicker();
+            }, 30000);
+
+            // BUG FIX #5: Auto-save every 10 seconds
+            autoSaveInterval = setInterval(saveUserState, 10000);
+
+            // BUG FIX #5: Save every 5 minutes of active mining
+            setInterval(() => {
+                if (active) saveUserState();
+            }, 5 * 60 * 1000);
 
             updatePoolUI();
             renderWorkers();
             renderNotifs();
             renderLeaderboard();
+            renderRigMarketplace();
+            renderPoolList();
+            renderHashrateBreakdown();
             updateNotifBadge();
             updateVIPTier();
             updateSparkline();
@@ -5146,10 +7224,20 @@
             updateDiffAdjust();
             updateMempool();
             updatePoolLuck();
+            updateWalletPreview();
+            updateCompoundProgress();
+            updatePayoutProgress();
+            updateMiningForecast();
 
             document.getElementById('tickerBlock').innerText = '#' + blockHeight.toLocaleString();
             document.getElementById('tickerDiff').innerText = networkDiff.toFixed(2) + 'T';
             document.getElementById('tickerNet').innerText = networkHashrate.toFixed(1) + ' EH/s';
+
+            setTimeout(() => {
+                if (Date.now() - lastLoginClaim > 24 * 60 * 60 * 1000) {
+                    checkDailyLogin();
+                }
+            }, 3000);
 
             rankInterval = setInterval(() => {
                 if (document.getElementById('page-ranks').classList.contains('active')) updateRank();
@@ -5174,6 +7262,9 @@
                 if (e.key === 's' || e.key === 'S') { openSupportChat(); }
                 if (e.key === 'n' || e.key === 'N') { openNotifDrawer(); }
             });
+
+            // Save on unload
+            window.addEventListener('beforeunload', saveUserState);
         });
     </script>
 </body>
