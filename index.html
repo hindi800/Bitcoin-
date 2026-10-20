@@ -176,11 +176,6 @@
             pointer-events: auto;
         }
 
-        @keyframes slideDownBanner {
-            from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-
         .user-profile-btn {
             display: flex;
             align-items: center;
@@ -1892,6 +1887,10 @@
         <span>Offline mode — data saved locally</span>
     </div>
 
+    <div id="syncWarning" style="display:none; position:fixed; top:70px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg, #ef4444, #b91c1c); color:#fff; padding:8px 16px; border-radius:8px; font-size:11px; font-weight:600; z-index:61; text-align:center; max-width:90vw;">
+        ⚠️ Cloud sync blocked by Firestore rules — data is local only
+    </div>
+
     <header class="header">
         <div class="brand">
             <div class="brand-icon">
@@ -2859,6 +2858,9 @@
         const WITHDRAWAL_THRESHOLD_BTC = 0.0005;
         const MINING_RATE_PER_HOUR = 0.0000003;
 
+        // BUG #4 FIX: btcNeedsMerge flag
+        let btcNeedsMerge = false;
+
         const firebaseConfig = {
             apiKey: "AIzaSyCcLSvyud3r6Npg58KvZiEB6d4f_5f1HBI",
             authDomain: "btc-53d0d.firebaseapp.com",
@@ -2961,7 +2963,8 @@
             miningActive: false, miningRate: 0, lastAirdropClaim: 0,
             referredBy: null, referredAt: null,
             tier1Referrals: [], tier2Referrals: [], tier3Referrals: [],
-            tier1Earnings: 0, tier2Earnings: 0, tier3Earnings: 0, lastTabId: null
+            tier1Earnings: 0, tier2Earnings: 0, tier3Earnings: 0, lastTabId: null,
+            languageCode: 'en'
         };
 
         let active = false;
@@ -3439,29 +3442,80 @@
 
         let sparklineData = [68950, 69120, 69080, 69340, 69210, 69450, 69380, 69520, 69680, 69540, 69720, 69860, 69780, 69940, 69820, 70010, 69950, 70120, 70040, 70210];
 
+        // ============================================================
+        // BUG #7 FIX: Parse initData string as fallback
+        // ============================================================
+        function formatTGUser(user) {
+            return {
+                id: 'tg_' + user.id,
+                username: user.username || `user_${user.id}`,
+                firstName: user.first_name || 'Miner',
+                lastName: user.last_name || '',
+                languageCode: user.language_code || 'en',
+                photoUrl: user.photo_url || null,
+                isPremium: user.is_premium || false
+            };
+        }
+
         function getTelegramUser() {
             try {
-                const user = tg.initDataUnsafe?.user;
-                if (user && user.id) {
-                    return {
-                        id: 'tg_' + user.id,
-                        username: user.username || `user_${user.id}`,
-                        firstName: user.first_name || 'Miner',
-                        lastName: user.last_name || '',
-                        languageCode: user.language_code || 'en',
-                        photoUrl: user.photo_url || null,
-                        isPremium: user.is_premium || false
-                    };
+                // Try unsafe first (fastest)
+                const unsafeUser = tg.initDataUnsafe?.user;
+                if (unsafeUser && unsafeUser.id) {
+                    return formatTGUser(unsafeUser);
                 }
-            } catch(e) {}
+                
+                // Fallback: parse signed initData
+                const initData = tg.initData;
+                if (initData) {
+                    const params = new URLSearchParams(initData);
+                    const userJson = params.get('user');
+                    if (userJson) {
+                        const user = JSON.parse(decodeURIComponent(userJson));
+                        if (user.id) return formatTGUser(user);
+                    }
+                }
+            } catch(e) {
+                console.warn('TG user parse error:', e);
+            }
             return null;
         }
 
+        // ============================================================
+        // BUG #8 FIX: Guest ID persistence with sessionStorage fallback
+        // ============================================================
+        function getGuestId() {
+            try {
+                let guestId = localStorage.getItem('btcminer_guest_id');
+                if (guestId) return guestId;
+                
+                guestId = 'guest_' + Date.now() + '_' + 
+                          Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('btcminer_guest_id', guestId);
+                return guestId;
+            } catch(e) {
+                // localStorage unavailable — use sessionStorage
+                try {
+                    let guestId = sessionStorage.getItem('btcminer_guest_id');
+                    if (guestId) return guestId;
+                    guestId = 'guest_' + Date.now();
+                    sessionStorage.setItem('btcminer_guest_id', guestId);
+                    return guestId;
+                } catch(e2) {
+                    // Last resort
+                    return 'guest_temp_' + Date.now();
+                }
+            }
+        }
+
+        // ============================================================
+        // BUG #3 FIX: LocalStorage debounce with immediate parameter
+        // ============================================================
         let saveLocalTimer = null;
-        function saveUserStateLocal() {
+        function saveUserStateLocal(immediate = false) {
             if (!userState.userId) return;
-            if (saveLocalTimer) clearTimeout(saveLocalTimer);
-            saveLocalTimer = setTimeout(() => {
+            
+            const doSave = () => {
                 try {
                     const lastBtc = userState.btc || 0;
                     if (btc > lastBtc) { userState.totalMined = (userState.totalMined || 0) + (btc - lastBtc); }
@@ -3486,13 +3540,22 @@
                     userState.lastKnownBtcPrice = btcPrice;
                     userState.referralCount = userState.referralCount || 0;
                     userState.referralEarnings = userState.referralEarnings || 0;
+                    userState.languageCode = userState.languageCode || 'en';
                     const tabId = sessionStorage.getItem('btcminer_tab') || Date.now().toString();
                     sessionStorage.setItem('btcminer_tab', tabId);
                     userState.lastTabId = tabId;
                     localStorage.setItem(`btcminer_state_${userState.userId}`, JSON.stringify(userState));
                     localStorage.setItem('btcminer_lastUser', userState.userId);
                 } catch(e) { console.warn('Local save failed:', e); }
-            }, 2000);
+            };
+            
+            if (immediate) {
+                if (saveLocalTimer) { clearTimeout(saveLocalTimer); saveLocalTimer = null; }
+                doSave();
+            } else {
+                if (saveLocalTimer) clearTimeout(saveLocalTimer);
+                saveLocalTimer = setTimeout(doSave, 500);
+            }
         }
 
         function loadUserStateLocal() {
@@ -3630,6 +3693,7 @@
 
             if (savedState && tgUser && savedState.userId === tgUser.id) {
                 userState = savedState;
+                userState.languageCode = tgUser.languageCode || userState.languageCode || 'en';
                 restoreUIFromState();
                 if (Date.now() - (savedState.lastUpdated || 0) > 3600000) {
                     setTimeout(() => { showToast('Welcome back!', `Good to see you, ${userState.firstName}`, 'success'); }, 1500);
@@ -3641,12 +3705,12 @@
                 userState.lastName = tgUser.lastName;
                 userState.photoUrl = tgUser.photoUrl;
                 userState.isPremium = tgUser.isPremium;
+                userState.languageCode = tgUser.languageCode;
                 userState.accountCreated = Date.now();
-                saveUserStateLocal();
+                saveUserStateLocal(true);
                 setTimeout(showWelcomeModal, 1000);
             } else {
-                const guestId = localStorage.getItem('btcminer_guest_id') || 'guest_' + Date.now();
-                localStorage.setItem('btcminer_guest_id', guestId);
+                const guestId = getGuestId();
                 if (savedState && savedState.userId === guestId) {
                     userState = savedState;
                     restoreUIFromState();
@@ -3656,7 +3720,7 @@
                     userState.firstName = 'Guest';
                     userState.lastName = 'Miner';
                     userState.accountCreated = Date.now();
-                    saveUserStateLocal();
+                    saveUserStateLocal(true);
                     setTimeout(showWelcomeModal, 1000);
                 }
             }
@@ -3664,6 +3728,9 @@
             updateReferralUI();
         }
 
+        // ============================================================
+        // BUG #1 + BUG #2 + BUG #4 FIX: Permission test, MAX merge, btcNeedsMerge
+        // ============================================================
         async function authenticateWithTelegram() {
             if (!firebaseAvailable || !fbAuth) {
                 updateSyncIndicator('local');
@@ -3683,6 +3750,23 @@
                 const user = credential.user;
                 console.log('✅ Firebase auth:', user.uid);
                 
+                // BUG #1 FIX: Permission test after sign-in
+                try {
+                    await fbDb.collection('users').doc(tgUser.id).set({
+                        _writeTest: true, lastUpdated: Date.now()
+                    }, { merge: true });
+                    console.log('✅ Write permission confirmed');
+                } catch(e) {
+                    if (e.code === 'permission-denied') {
+                        console.error('❌ FIRESTORE RULES BLOCK WRITES — STUCK IN LOCAL MODE');
+                        showToast('Cloud Sync Blocked', 'Firestore rules deny access', 'error');
+                        updateSyncIndicator('offline');
+                        const syncWarning = document.getElementById('syncWarning');
+                        if (syncWarning) syncWarning.style.display = 'block';
+                        return null;
+                    }
+                }
+                
                 const uidMappingRef = fbDb.collection('uid_mappings').doc(user.uid);
                 try {
                     await uidMappingRef.set({
@@ -3694,6 +3778,7 @@
                     console.warn('UID mapping failed (non-critical):', e);
                 }
 
+                // BUG #2 FIX: MAX merge strategy for BTC
                 const profileRef = fbDb.collection('users').doc(tgUser.id);
                 const profileSnap = await profileRef.get();
 
@@ -3701,24 +3786,51 @@
                     const data = profileSnap.data();
                     console.log('📂 User exists, last updated:', new Date(data.lastUpdated || 0).toLocaleString());
                     
-                    if (data.lastUpdated && data.lastUpdated > (userState.lastUpdated || 0)) {
-                        userState = { ...userState, ...data, userId: tgUser.id };
+                    // BUG #4 FIX: check btcNeedsMerge first
+                    if (btcNeedsMerge) {
+                        // Don't override — local has unsynced changes
+                        const serverBtc = data.btc || 0;
+                        if (btc >= serverBtc) {
+                            // Keep local, push to server
+                            await profileRef.set({ btc, lastUpdated: Date.now() }, { merge: true });
+                            userState = { ...userState, ...data, userId: tgUser.id, btc: btc };
+                            btc = btc;
+                            console.log('✅ btcNeedsMerge: kept local (higher), pushed to server');
+                        } else {
+                            // Server is higher — take it
+                            btc = serverBtc;
+                            userState = { ...userState, ...data, userId: tgUser.id, btc: serverBtc };
+                            updateBalanceOdometer(btc);
+                            console.log('✅ btcNeedsMerge: server was higher, took server value');
+                        }
+                        btcNeedsMerge = false;
                         restoreUIFromState();
-                        console.log('✅ Backend data loaded (newer)');
+                    } else {
+                        // No local changes — use MAX merge
+                        const serverBtc = data.btc || 0;
+                        const localBtc = btc;
+                        const mergedBtc = Math.max(serverBtc, localBtc);
+                        
+                        console.log('BTC merge:', { serverBtc, localBtc, mergedBtc });
+                        
+                        userState = { ...userState, ...data, userId: tgUser.id, btc: mergedBtc };
+                        btc = mergedBtc;
+                        restoreUIFromState();
+                        
+                        // If local was higher, immediately push to server
+                        if (localBtc > serverBtc) {
+                            await profileRef.set({ btc: localBtc, lastUpdated: Date.now() }, { merge: true });
+                            console.log('✅ Pushed local BTC to server');
+                        }
                     }
                 } else {
-                    console.log('📝 Creating new user profile...');
+                    // First time — create profile with current local state
                     await profileRef.set({
-                        ...userState,
-                        userId: tgUser.id,
-                        username: tgUser.username,
-                        firstName: tgUser.firstName,
-                        lastName: tgUser.lastName,
-                        photoUrl: tgUser.photoUrl,
-                        accountCreated: Date.now(),
-                        lastUpdated: Date.now()
+                        ...userState, userId: tgUser.id, btc: btc,
+                        accountCreated: Date.now(), lastUpdated: Date.now()
                     });
-                    console.log('✅ Profile created');
+                    btcNeedsMerge = false;
+                    console.log('✅ Profile created with btc:', btc);
                 }
 
                 updateSyncIndicator('synced');
@@ -3727,6 +3839,8 @@
                 console.error('❌ Auth failed:', e.code, e.message);
                 if (e.code === 'permission-denied') {
                     console.error('👉 FIX: Update Firestore Rules to allow tg_* and guest_* writes');
+                    const syncWarning = document.getElementById('syncWarning');
+                    if (syncWarning) syncWarning.style.display = 'block';
                 }
                 updateSyncIndicator('offline');
                 return null;
@@ -3760,9 +3874,12 @@
                     withdrawalHistory: WITHDRAWAL_HISTORY.slice(0, 20),
                     sessionHistory: (userState.sessionHistory || []).slice(0, 20),
                     activityLog: (userState.activityLog || []).slice(0, 20),
+                    languageCode: userState.languageCode || 'en',
                     lastUpdated: Date.now(), lastKnownBtcPrice: btcPrice
                 };
                 await fbDb.collection('users').doc(userState.userId).set(payload, { merge: true });
+                // Clear merge flag after successful sync
+                btcNeedsMerge = false;
                 updateSyncIndicator('synced');
             } catch(e) {
                 console.warn('Sync failed:', e);
@@ -3775,15 +3892,26 @@
             debouncedSync();
         }
 
+        // ============================================================
+        // BUG #10 FIX: Leaderboard query without index
+        // ============================================================
         async function fetchRealLeaderboard() {
             if (!firebaseAvailable || !fbDb) return;
             try {
-                const snapshot = await fbDb.collection('users').orderBy('btc', 'desc').limit(100).get();
+                // OLD (requires index): fbDb.collection('users').orderBy('btc', 'desc').limit(100).get();
+                // NEW (no index needed):
+                const snapshot = await fbDb.collection('users').limit(200).get();
+                const users = [];
+                snapshot.forEach(doc => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+                users.sort((a, b) => (b.btc || 0) - (a.btc || 0));
+                const top100 = users.slice(0, 100);
+                
                 const realUsers = [];
                 let rank = 1;
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const displayName = data.username ? '@' + data.username : (data.firstName || 'User_' + doc.id.substring(0, 6));
+                top100.forEach(data => {
+                    const displayName = data.username ? '@' + data.username : (data.firstName || 'User_' + (data.userId || data.id || '').substring(0, 6));
                     realUsers.push({
                         rank: rank++, name: displayName, flag: '🌐',
                         node: data.activePoolId || 'global',
@@ -3801,6 +3929,9 @@
             } catch(e) { console.warn('Leaderboard fetch failed:', e); }
         }
 
+        // ============================================================
+        // BUG #6 FIX: Listener skip if btcNeedsMerge, use MAX
+        // ============================================================
         let userDocUnsubscribe = null;
         function listenToUserDoc() {
             if (!firebaseAvailable || !fbDb || !userState.userId) return;
@@ -3809,27 +3940,36 @@
                 .onSnapshot((doc) => {
                     if (!doc.exists) return;
                     const data = doc.data();
-                    if (data.lastUpdated && data.lastUpdated > (userState.lastUpdated || 0)) {
-                        if (data.btc !== undefined && data.btc !== btc) {
-                            btc = data.btc;
+                    
+                    // Skip if we have unsynced local changes
+                    if (btcNeedsMerge) {
+                        console.log('Skipping listener update — local changes pending');
+                        return;
+                    }
+                    
+                    // Use MAX for btc, not last-write-wins
+                    if (data.btc !== undefined) {
+                        const serverBtc = data.btc;
+                        if (serverBtc > btc) {
+                            btc = serverBtc;
                             updateBalanceOdometer(btc);
                             document.getElementById('usdVal').innerText = (btc * btcPrice).toFixed(2);
                             updateWithdrawButton();
                             updateWithdrawProgressCard();
                         }
-                        if (data.vipTier && data.vipTier !== vipTier) {
-                            vipTier = data.vipTier;
-                            updateVIPTier();
-                        }
-                        if (data.ownedRigs) {
-                            RIGS.forEach(r => { r.owned = data.ownedRigs.includes(r.id); });
-                            renderRigMarketplace();
-                            renderHashrateBreakdown();
-                        }
-                        if (data.withdrawalHistory) {
-                            WITHDRAWAL_HISTORY.length = 0;
-                            WITHDRAWAL_HISTORY.push(...data.withdrawalHistory);
-                        }
+                    }
+                    if (data.vipTier && data.vipTier !== vipTier) {
+                        vipTier = data.vipTier;
+                        updateVIPTier();
+                    }
+                    if (data.ownedRigs) {
+                        RIGS.forEach(r => { r.owned = data.ownedRigs.includes(r.id); });
+                        renderRigMarketplace();
+                        renderHashrateBreakdown();
+                    }
+                    if (data.withdrawalHistory) {
+                        WITHDRAWAL_HISTORY.length = 0;
+                        WITHDRAWAL_HISTORY.push(...data.withdrawalHistory);
                     }
                 }, (err) => { console.warn('User doc listener error:', err); });
         }
@@ -4032,7 +4172,7 @@
                         const data = JSON.parse(ev.target.result);
                         if (data.state && data.state.userId) {
                             userState = data.state;
-                            saveUserStateLocal();
+                            saveUserStateLocal(true);
                             location.reload();
                         } else {
                             showToast('Invalid Backup', 'File format not recognized', 'error');
@@ -4545,6 +4685,7 @@
                 return;
             }
             btc -= rig.price;
+            btcNeedsMerge = true;
             rig.owned = true;
             haptic('success');
             updateBalanceOdometer(btc);
@@ -4560,7 +4701,7 @@
             addTerminalLog(`Rig purchased: ${rig.name} (${rig.hash} TH/s)`, 'info');
             pushNotification('New Rig Deployed', `${rig.name} is now hashing for your account`, 'info');
             logActivity(`Purchased ${rig.name}`);
-            saveUserStateLocal();
+            saveUserStateLocal(true);
             debouncedSync();
         }
 
@@ -4842,7 +4983,7 @@
                 }, 1200);
                 showToast('Mining Started', 'Node is now generating hashrate', 'success');
                 logActivity('Mining started');
-                saveUserStateLocal();
+                saveUserStateLocal(true);
                 debouncedSync();
             }, 500);
         }
@@ -4865,11 +5006,12 @@
             liveCounterStartTime = Date.now();
             lastLiveSessionBtc = btc;
             
-            const VISUAL_MULTIPLIER = 100;
+            // BUG #9 FIX: Remove 100x multiplier — show real rate
+            const VISUAL_MULTIPLIER = 1;
             const displaySatPerSec = (MINING_RATE_PER_HOUR * 1e8 / 3600) * VISUAL_MULTIPLIER;
             
             const rateEl = document.getElementById('liveRateDisplay');
-            if (rateEl) rateEl.innerText = displaySatPerSec.toFixed(2) + ' sat/sec';
+            if (rateEl) rateEl.innerText = displaySatPerSec.toFixed(4) + ' sat/sec';
             
             liveCounterInterval = setInterval(() => {
                 if (!active) return;
@@ -4880,7 +5022,7 @@
                 const liveEl = document.getElementById('liveSatCounter');
                 if (liveEl) {
                     if (totalDisplaySat < 100) {
-                        liveEl.innerText = '+' + totalDisplaySat.toFixed(3) + ' sat';
+                        liveEl.innerText = '+' + totalDisplaySat.toFixed(4) + ' sat';
                     } else if (totalDisplaySat < 10000) {
                         liveEl.innerText = '+' + totalDisplaySat.toFixed(1) + ' sat';
                     } else {
@@ -4969,6 +5111,7 @@
                 const cfg = FIRMWARE_CONFIG[firmwareMode];
                 const increment = MINING_RATE_PER_HOUR / 1800;
                 btc += increment;
+                btcNeedsMerge = true;
                 sessionMinedBtc += increment;
                 userState.totalMined = (userState.totalMined || 0) + increment;
                 sevenDayEarnings[todayEarningsIndex] += increment;
@@ -4981,7 +5124,7 @@
                 if (now - lastBalanceRateUpdate > 10000) {
                     lastBalanceRateUpdate = now;
                     const satPerHour = MINING_RATE_PER_HOUR * 1e8;
-                    document.getElementById('balanceRate').innerText = '+' + satPerHour.toFixed(2) + ' sat/hour';
+                    document.getElementById('balanceRate').innerText = '+' + satPerHour.toFixed(4) + ' sat/hour';
                 }
                 if (btc - lastMilestone >= 0.00000300) { lastMilestone = btc; haptic('success'); }
                 updateWithdrawButton();
@@ -5153,7 +5296,7 @@
             const durStr = h > 0 ? `${h}h ${m}m` : (m > 0 ? `${m}m ${s}s` : `${s}s`);
             logActivity(`Mining stopped (${durStr})`);
             userState.sessionsCompleted = (userState.sessionsCompleted || 0) + 1;
-            saveUserStateLocal();
+            saveUserStateLocal(true);
             debouncedSync();
             setTimeout(() => showSessionSummary(summaryData), 300);
         }
@@ -5620,6 +5763,9 @@
         let leaderboardNewMembers = 0;
         let lastLeaderboardRender = 0;
 
+        // ============================================================
+        // BUG #5 FIX: Real username instead of hardcoded
+        // ============================================================
         function renderLeaderboard() {
             const now = Date.now();
             if (now - lastLeaderboardRender < 5000) return;
@@ -5629,8 +5775,10 @@
             list.innerHTML = '';
             const userData = {
                 rank: userRank,
-                flag: '🇮🇳',
-                name: userState.firstName ? `${userState.firstName} (You)` : 'You (Anax)',
+                flag: userState.languageCode === 'hi' ? '🇮🇳' : '🌐',
+                name: userState.username 
+                    ? `@${userState.username} (You)` 
+                    : (userState.firstName || 'You'),
                 node: 'Personal Enterprise Node',
                 btc: btc,
                 hash: active ? getTotalHashrate() : 0,
@@ -5912,6 +6060,7 @@
                 </div>
             `);
             addTerminalLog('Withdrawal verification submitted — awaiting AML review', 'warn');
+            saveUserStateLocal(true);
             debouncedSync();
         }
 
@@ -6013,6 +6162,7 @@
             const baseAmount = 0.00005000;
             const scaledAmount = baseAmount * tier.airdropMult;
             btc += scaledAmount;
+            btcNeedsMerge = true;
             airdropClaimed = true;
             lastAirdropClaim = now;
             userState.lastAirdropClaim = now;
@@ -6027,7 +6177,7 @@
             updateWithdrawButton();
             updateWithdrawProgressCard();
             logActivity(`Airdrop claimed`, `+${scaledAmount.toFixed(8)} BTC`);
-            saveUserStateLocal();
+            saveUserStateLocal(true);
             debouncedSync();
             showModal('Airdrop Claimed', `+${scaledAmount.toFixed(8)} BTC has been credited to your unconfirmed balance.<br><br><span style="color:var(--accent-green); font-size:10.5px;">VIP ${tier.name} multiplier: ${tier.airdropMult}x</span>`, 'check');
         }
@@ -6634,6 +6784,7 @@
 
         function claimDailyReward(amount) {
             btc += amount / 1e8;
+            btcNeedsMerge = true;
             lastLoginClaim = Date.now();
             loginStreak++;
             haptic('success');
@@ -6647,7 +6798,7 @@
             setTimeout(() => showToast('Reward Claimed!', `+${amount} sat added to balance`, 'success'), 400);
             addTerminalLog(`Daily reward claimed: +${amount} sat`, 'info');
             logActivity(`Daily login reward`, `+${amount} sat`);
-            saveUserStateLocal();
+            saveUserStateLocal(true);
             debouncedSync();
         }
 
@@ -6701,6 +6852,7 @@
             const offlineEarnings = offlineHours * MINING_RATE_PER_HOUR;
             if (offlineEarnings > 0.00000001) {
                 btc += offlineEarnings;
+                btcNeedsMerge = true;
                 userState.totalMined = (userState.totalMined || 0) + offlineEarnings;
                 setTimeout(() => showToast('Offline Mining', 'Earned ' + offlineEarnings.toFixed(8) + ' BTC while away', 'success'), 2000);
                 addTerminalLog(`Offline mining: +${offlineEarnings.toFixed(8)} BTC over ${offlineHours.toFixed(1)}h`, 'info');
@@ -6713,7 +6865,7 @@
             console.log('═══════════════════════════════════════');
             console.log('📍 Firebase Config:', firebaseConfig.projectId);
             console.log('📍 Firebase Available:', firebaseAvailable ? 'YES' : 'NO');
-            console.log('📍 Telegram WebApp:', tg.initDataUnsafe?.user ? 'YES' : 'NO');
+            console.log('📍 Telegram WebApp:', tg.initDataUnsafe?.user ? 'YES' : (tg.initData ? 'YES (initData)' : 'NO'));
             console.log('═══════════════════════════════════════');
 
             captureReferral();
@@ -6739,7 +6891,11 @@
                     await processPendingReferral();
                     await loadRealReferralStats();
                     updateSyncIndicator('synced');
-                } else { updateSyncIndicator('offline'); }
+                } else { 
+                    updateSyncIndicator('offline');
+                    const syncWarning = document.getElementById('syncWarning');
+                    if (syncWarning && firebaseAvailable) syncWarning.style.display = 'block';
+                }
             } else { updateSyncIndicator('local'); }
 
             if (firebaseAvailable && fbAuth?.currentUser) {
@@ -6865,7 +7021,7 @@
             });
 
             window.addEventListener('beforeunload', () => {
-                saveUserStateLocal();
+                saveUserStateLocal(true);
                 debouncedSync();
             });
         });
