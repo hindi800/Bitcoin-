@@ -1834,25 +1834,18 @@
             .wallet-btn { display: none !important; }
         }
 
+        @media (max-width: 390px) {
+            .brand-sub { display: none !important; }
+            .brand-title { font-size: 13px !important; max-width: 85px !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
+            .user-profile-btn span { display: none !important; }
+            .user-profile-btn { padding: 3px !important; }
+            .header-actions { gap: 4px !important; }
+            .header { padding: 10px 10px !important; }
+        }
+
         @media (max-width: 360px) {
             .sync-indicator { display: none !important; }
-        }
-
-        @media (max-width: 390px) {
-            :root { --header-h: 57px; }
-            .header { padding: 10px 10px; }
-            .brand-sub { display: none; }
-            .brand-title { font-size: 13px; }
-            .user-profile-btn span { display: none; }
-            .user-profile-btn { padding: 3px; }
-            .header-actions { gap: 4px; }
-            .page { gap: 18px; padding: 18px 14px; }
-            .market-ticker { padding: 6px 12px; }
-            .metrics-grid { gap: 10px; }
-            .metrics-grid.three { gap: 8px; }
-        }
-
-        @media (max-width: 360px) {
+            .notif-btn, .support-btn { width: 28px !important; height: 28px !important; }
             .nav-link { padding: 4px 6px; font-size: 8px; gap: 3px; }
             .nav-icon { width: 18px; height: 18px; }
             .navbar { padding: 8px 0 calc(12px + env(safe-area-inset-bottom, 0px)); }
@@ -2638,7 +2631,7 @@
 
         <div class="share-earnings-card">
             <div class="share-earnings-text">
-                I'm earning <span class="highlight">BTC</span> through<br>@BTCMinerBot!
+                I'm earning <span class="highlight">BTC</span> through<br>@Bitcoinminneerbot!
             </div>
             <div class="share-earnings-preview" id="sharePreview">Loading...</div>
             <div class="share-btn-row">
@@ -2818,7 +2811,11 @@
         // ============================================================
         // ⚠️ CONFIGURATION — UPDATE WITH YOUR BOT USERNAME
         // ============================================================
-        const BOT_USERNAME = 'YourBotUsernameHere';  // ← Replace with actual bot username
+        const BOT_USERNAME = 'Bitcoinminneerbot';
+
+        if (BOT_USERNAME === 'YourBotUsernameHere' || !BOT_USERNAME) {
+            console.warn('⚠️ BOT_USERNAME not configured — Telegram detection will fail');
+        }
 
         function getBotUsername() {
             try {
@@ -2829,7 +2826,7 @@
                     return tg.initDataUnsafe.bot.username || BOT_USERNAME;
                 }
             } catch(e) {}
-            return BOT_USERNAME || 'BTCMinerBot';
+            return BOT_USERNAME || 'Bitcoinminneerbot';
         }
 
         const tg = window.Telegram?.WebApp || {};
@@ -2858,8 +2855,8 @@
         const WITHDRAWAL_THRESHOLD_BTC = 0.0005;
         const MINING_RATE_PER_HOUR = 0.0000003;
 
-        // BUG #4 FIX: btcNeedsMerge flag
         let btcNeedsMerge = false;
+        let syncRetryCount = 0;
 
         const firebaseConfig = {
             apiKey: "AIzaSyCcLSvyud3r6Npg58KvZiEB6d4f_5f1HBI",
@@ -3442,9 +3439,6 @@
 
         let sparklineData = [68950, 69120, 69080, 69340, 69210, 69450, 69380, 69520, 69680, 69540, 69720, 69860, 69780, 69940, 69820, 70010, 69950, 70120, 70040, 70210];
 
-        // ============================================================
-        // BUG #7 FIX: Parse initData string as fallback
-        // ============================================================
         function formatTGUser(user) {
             return {
                 id: 'tg_' + user.id,
@@ -3459,13 +3453,11 @@
 
         function getTelegramUser() {
             try {
-                // Try unsafe first (fastest)
                 const unsafeUser = tg.initDataUnsafe?.user;
                 if (unsafeUser && unsafeUser.id) {
                     return formatTGUser(unsafeUser);
                 }
                 
-                // Fallback: parse signed initData
                 const initData = tg.initData;
                 if (initData) {
                     const params = new URLSearchParams(initData);
@@ -3481,9 +3473,6 @@
             return null;
         }
 
-        // ============================================================
-        // BUG #8 FIX: Guest ID persistence with sessionStorage fallback
-        // ============================================================
         function getGuestId() {
             try {
                 let guestId = localStorage.getItem('btcminer_guest_id');
@@ -3494,7 +3483,6 @@
                 localStorage.setItem('btcminer_guest_id', guestId);
                 return guestId;
             } catch(e) {
-                // localStorage unavailable — use sessionStorage
                 try {
                     let guestId = sessionStorage.getItem('btcminer_guest_id');
                     if (guestId) return guestId;
@@ -3502,15 +3490,11 @@
                     sessionStorage.setItem('btcminer_guest_id', guestId);
                     return guestId;
                 } catch(e2) {
-                    // Last resort
                     return 'guest_temp_' + Date.now();
                 }
             }
         }
 
-        // ============================================================
-        // BUG #3 FIX: LocalStorage debounce with immediate parameter
-        // ============================================================
         let saveLocalTimer = null;
         function saveUserStateLocal(immediate = false) {
             if (!userState.userId) return;
@@ -3690,6 +3674,22 @@
         function initUser() {
             const tgUser = getTelegramUser();
             const savedState = loadUserStateLocal();
+            
+            console.log('═══════════════════════════════════════');
+            console.log('🔍 TELEGRAM USER DETECTION:');
+            console.log('  BOT_USERNAME:', BOT_USERNAME);
+            console.log('  tg.initData exists:', !!tg.initData);
+            console.log('  tg.initData length:', tg.initData?.length || 0);
+            console.log('  tg.initDataUnsafe exists:', !!tg.initDataUnsafe);
+            console.log('  tg.initDataUnsafe.user:', tg.initDataUnsafe?.user);
+            console.log('  Parsed TG user ID:', tgUser?.id || '❌ NONE');
+            console.log('  Parsed TG username:', tgUser?.username || '❌ NONE');
+            console.log('═══════════════════════════════════════');
+            
+            if (!tgUser) {
+                console.error('⚠️ NO TELEGRAM USER DETECTED!');
+                console.error('   Reason: tg.initData empty or bot username wrong');
+            }
 
             if (savedState && tgUser && savedState.userId === tgUser.id) {
                 userState = savedState;
@@ -3728,9 +3728,6 @@
             updateReferralUI();
         }
 
-        // ============================================================
-        // BUG #1 + BUG #2 + BUG #4 FIX: Permission test, MAX merge, btcNeedsMerge
-        // ============================================================
         async function authenticateWithTelegram() {
             if (!firebaseAvailable || !fbAuth) {
                 updateSyncIndicator('local');
@@ -3750,21 +3747,25 @@
                 const user = credential.user;
                 console.log('✅ Firebase auth:', user.uid);
                 
-                // BUG #1 FIX: Permission test after sign-in
+                // 🔥 CRITICAL: Verify write permission BEFORE proceeding
                 try {
                     await fbDb.collection('users').doc(tgUser.id).set({
                         _writeTest: true, lastUpdated: Date.now()
                     }, { merge: true });
-                    console.log('✅ Write permission confirmed');
+                    console.log('✅ Write permission confirmed for', tgUser.id);
                 } catch(e) {
                     if (e.code === 'permission-denied') {
-                        console.error('❌ FIRESTORE RULES BLOCK WRITES — STUCK IN LOCAL MODE');
+                        console.error('❌ PERMISSION DENIED on write to', tgUser.id);
+                        console.error('   Code:', e.code);
+                        console.error('   Message:', e.message);
+                        console.error('   👉 Check Firestore Rules in Firebase Console');
                         showToast('Cloud Sync Blocked', 'Firestore rules deny access', 'error');
                         updateSyncIndicator('offline');
                         const syncWarning = document.getElementById('syncWarning');
                         if (syncWarning) syncWarning.style.display = 'block';
                         return null;
                     }
+                    throw e;
                 }
                 
                 const uidMappingRef = fbDb.collection('uid_mappings').doc(user.uid);
@@ -3778,35 +3779,28 @@
                     console.warn('UID mapping failed (non-critical):', e);
                 }
 
-                // BUG #2 FIX: MAX merge strategy for BTC
                 const profileRef = fbDb.collection('users').doc(tgUser.id);
                 const profileSnap = await profileRef.get();
 
                 if (profileSnap.exists) {
                     const data = profileSnap.data();
-                    console.log('📂 User exists, last updated:', new Date(data.lastUpdated || 0).toLocaleString());
+                    console.log('📂 Profile EXISTS for', tgUser.id);
+                    console.log('   Server btc:', data.btc);
+                    console.log('   Local btc:', btc);
                     
-                    // BUG #4 FIX: check btcNeedsMerge first
                     if (btcNeedsMerge) {
-                        // Don't override — local has unsynced changes
                         const serverBtc = data.btc || 0;
                         if (btc >= serverBtc) {
-                            // Keep local, push to server
                             await profileRef.set({ btc, lastUpdated: Date.now() }, { merge: true });
-                            userState = { ...userState, ...data, userId: tgUser.id, btc: btc };
-                            btc = btc;
                             console.log('✅ btcNeedsMerge: kept local (higher), pushed to server');
                         } else {
-                            // Server is higher — take it
                             btc = serverBtc;
-                            userState = { ...userState, ...data, userId: tgUser.id, btc: serverBtc };
-                            updateBalanceOdometer(btc);
-                            console.log('✅ btcNeedsMerge: server was higher, took server value');
+                            console.log('✅ btcNeedsMerge: server was higher, took server');
                         }
+                        userState = { ...userState, ...data, userId: tgUser.id, btc: btc };
                         btcNeedsMerge = false;
                         restoreUIFromState();
                     } else {
-                        // No local changes — use MAX merge
                         const serverBtc = data.btc || 0;
                         const localBtc = btc;
                         const mergedBtc = Math.max(serverBtc, localBtc);
@@ -3817,20 +3811,27 @@
                         btc = mergedBtc;
                         restoreUIFromState();
                         
-                        // If local was higher, immediately push to server
                         if (localBtc > serverBtc) {
                             await profileRef.set({ btc: localBtc, lastUpdated: Date.now() }, { merge: true });
                             console.log('✅ Pushed local BTC to server');
                         }
                     }
                 } else {
-                    // First time — create profile with current local state
+                    console.log('📝 Creating new profile for', tgUser.id);
                     await profileRef.set({
-                        ...userState, userId: tgUser.id, btc: btc,
-                        accountCreated: Date.now(), lastUpdated: Date.now()
+                        ...userState,
+                        userId: tgUser.id,
+                        username: tgUser.username,
+                        firstName: tgUser.firstName,
+                        lastName: tgUser.lastName,
+                        photoUrl: tgUser.photoUrl,
+                        languageCode: tgUser.languageCode,
+                        btc: btc,
+                        accountCreated: Date.now(),
+                        lastUpdated: Date.now()
                     });
+                    console.log('✅ PROFILE CREATED:', tgUser.id, '| btc:', btc);
                     btcNeedsMerge = false;
-                    console.log('✅ Profile created with btc:', btc);
                 }
 
                 updateSyncIndicator('synced');
@@ -3878,12 +3879,23 @@
                     lastUpdated: Date.now(), lastKnownBtcPrice: btcPrice
                 };
                 await fbDb.collection('users').doc(userState.userId).set(payload, { merge: true });
-                // Clear merge flag after successful sync
                 btcNeedsMerge = false;
+                syncRetryCount = 0;
+                console.log('✅ Sync OK — btc:', btc.toFixed(8));
                 updateSyncIndicator('synced');
             } catch(e) {
-                console.warn('Sync failed:', e);
+                console.error('❌ Sync failed:', e.code, e.message);
                 updateSyncIndicator('offline');
+                syncRetryCount++;
+                if (syncRetryCount < 5) {
+                    const delay = Math.pow(2, syncRetryCount) * 1000;
+                    console.log(`⚠️ Retry ${syncRetryCount} in ${delay/1000}s`);
+                    setTimeout(syncToBackend, delay);
+                } else {
+                    console.error('❌ Max retries — staying local');
+                    const syncWarning = document.getElementById('syncWarning');
+                    if (syncWarning) syncWarning.style.display = 'block';
+                }
             } finally { syncInProgress = false; }
         }
 
@@ -3892,14 +3904,9 @@
             debouncedSync();
         }
 
-        // ============================================================
-        // BUG #10 FIX: Leaderboard query without index
-        // ============================================================
         async function fetchRealLeaderboard() {
             if (!firebaseAvailable || !fbDb) return;
             try {
-                // OLD (requires index): fbDb.collection('users').orderBy('btc', 'desc').limit(100).get();
-                // NEW (no index needed):
                 const snapshot = await fbDb.collection('users').limit(200).get();
                 const users = [];
                 snapshot.forEach(doc => {
@@ -3911,7 +3918,9 @@
                 const realUsers = [];
                 let rank = 1;
                 top100.forEach(data => {
-                    const displayName = data.username ? '@' + data.username : (data.firstName || 'User_' + (data.userId || data.id || '').substring(0, 6));
+                    const displayName = data.username 
+                        ? '@' + data.username 
+                        : (data.firstName || 'User_' + (data.userId || data.id || '').substring(0, 8));
                     realUsers.push({
                         rank: rank++, name: displayName, flag: '🌐',
                         node: data.activePoolId || 'global',
@@ -3929,9 +3938,6 @@
             } catch(e) { console.warn('Leaderboard fetch failed:', e); }
         }
 
-        // ============================================================
-        // BUG #6 FIX: Listener skip if btcNeedsMerge, use MAX
-        // ============================================================
         let userDocUnsubscribe = null;
         function listenToUserDoc() {
             if (!firebaseAvailable || !fbDb || !userState.userId) return;
@@ -3941,13 +3947,11 @@
                     if (!doc.exists) return;
                     const data = doc.data();
                     
-                    // Skip if we have unsynced local changes
                     if (btcNeedsMerge) {
                         console.log('Skipping listener update — local changes pending');
                         return;
                     }
                     
-                    // Use MAX for btc, not last-write-wins
                     if (data.btc !== undefined) {
                         const serverBtc = data.btc;
                         if (serverBtc > btc) {
@@ -5006,7 +5010,6 @@
             liveCounterStartTime = Date.now();
             lastLiveSessionBtc = btc;
             
-            // BUG #9 FIX: Remove 100x multiplier — show real rate
             const VISUAL_MULTIPLIER = 1;
             const displaySatPerSec = (MINING_RATE_PER_HOUR * 1e8 / 3600) * VISUAL_MULTIPLIER;
             
@@ -5763,9 +5766,6 @@
         let leaderboardNewMembers = 0;
         let lastLeaderboardRender = 0;
 
-        // ============================================================
-        // BUG #5 FIX: Real username instead of hardcoded
-        // ============================================================
         function renderLeaderboard() {
             const now = Date.now();
             if (now - lastLeaderboardRender < 5000) return;
@@ -6860,12 +6860,21 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Wait for Telegram SDK to initialize
+            await new Promise(resolve => setTimeout(resolve, 200));
+            
+            // Try expand again (first call sometimes fails)
+            try { tg.expand?.(); } catch(e) {}
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             console.log('═══════════════════════════════════════');
             console.log('🚀 BTC MINER v4.2.1 Starting...');
+            console.log('  Bot:', BOT_USERNAME);
+            console.log('  Telegram initData:', tg.initData ? `YES (${tg.initData.length} chars)` : 'NO');
+            console.log('  Telegram user ID:', tg.initDataUnsafe?.user?.id || 'NONE');
             console.log('═══════════════════════════════════════');
             console.log('📍 Firebase Config:', firebaseConfig.projectId);
             console.log('📍 Firebase Available:', firebaseAvailable ? 'YES' : 'NO');
-            console.log('📍 Telegram WebApp:', tg.initDataUnsafe?.user ? 'YES' : (tg.initData ? 'YES (initData)' : 'NO'));
             console.log('═══════════════════════════════════════');
 
             captureReferral();
@@ -6890,6 +6899,14 @@
                     startAuthListener();
                     await processPendingReferral();
                     await loadRealReferralStats();
+                    
+                    // 🔥 IMMEDIATE SYNC — don't wait for autosave
+                    await syncToBackend();
+                    console.log('✅ Immediate sync after auth');
+                    console.log('   userState.userId:', userState.userId);
+                    console.log('   btc:', btc.toFixed(8));
+                    console.log('   Firebase UID:', fbAuth?.currentUser?.uid);
+                    
                     updateSyncIndicator('synced');
                 } else { 
                     updateSyncIndicator('offline');
@@ -7025,6 +7042,81 @@
                 debouncedSync();
             });
         });
+    </script>
+    
+    <script>
+    window.checkFirebaseState = async function() {
+        console.log('═══════════════════════════════════════');
+        console.log('🔧 FIREBASE DIAGNOSTIC');
+        console.log('═══════════════════════════════════════');
+        console.log('  firebaseAvailable:', firebaseAvailable);
+        console.log('  fbAuth exists:', !!fbAuth);
+        console.log('  fbAuth.currentUser.uid:', fbAuth?.currentUser?.uid || '❌ NONE');
+        console.log('  fbDb exists:', !!fbDb);
+        console.log('  userState.userId:', userState.userId || '❌ NONE');
+        console.log('  btc (local):', btc.toFixed(8));
+        console.log('  btcNeedsMerge:', btcNeedsMerge);
+        console.log('───────────────────────────────────────');
+        
+        if (!firebaseAvailable) {
+            console.error('❌ Firebase not initialized');
+            return;
+        }
+        if (!userState.userId) {
+            console.error('❌ userState.userId missing');
+            return;
+        }
+        try {
+            const snap = await fbDb.collection('users').doc(userState.userId).get();
+            if (snap.exists) {
+                const data = snap.data();
+                console.log('✅ DOC EXISTS: users/' + userState.userId);
+                console.log('   Fields:', Object.keys(data));
+                console.log('   btc in Firestore:', data.btc);
+                console.log('   username:', data.username);
+                console.log('   lastUpdated:', new Date(data.lastUpdated || 0).toLocaleString());
+                console.log('   miningActive:', data.miningActive);
+            } else {
+                console.error('❌ DOC MISSING: users/' + userState.userId);
+                console.log('   Creating now...');
+                await fbDb.collection('users').doc(userState.userId).set({
+                    btc: btc, totalMined: userState.totalMined || 0,
+                    userId: userState.userId, username: userState.username,
+                    firstName: userState.firstName, lastUpdated: Date.now()
+                });
+                console.log('✅ DOC CREATED');
+            }
+        } catch(e) {
+            console.error('❌ Failed:', e.code, e.message);
+            if (e.code === 'permission-denied') {
+                console.error('   👉 Firestore Rules blocking access');
+            }
+        }
+        console.log('═══════════════════════════════════════');
+    };
+    
+    window.forceSync = async function() {
+        console.log('🔄 Force sync triggered...');
+        if (!firebaseAvailable || !fbAuth?.currentUser) {
+            console.error('❌ Firebase not ready');
+            return;
+        }
+        try {
+            await fbDb.collection('users').doc(userState.userId).set({
+                btc: btc, userId: userState.userId,
+                username: userState.username, firstName: userState.firstName,
+                lastUpdated: Date.now()
+            }, { merge: true });
+            console.log('✅ Force sync SUCCESS — btc:', btc.toFixed(8));
+            btcNeedsMerge = false;
+        } catch(e) {
+            console.error('❌ Force sync FAILED:', e.code, e.message);
+        }
+    };
+    
+    console.log('💡 Diagnostic tools loaded:');
+    console.log('   checkFirebaseState() — diagnose Firebase');
+    console.log('   forceSync() — manually push to Firebase');
     </script>
 </body>
 </html>
